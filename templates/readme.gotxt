@@ -1,0 +1,54 @@
+{{if .AddBumpVersion}}![Version](https://img.shields.io/badge/version-0.0.0-orange.svg)
+
+{{end}}# {{.ProjectName}}
+
+Project description here...
+
+---
+
+## Requirements
+
+Requirements here...
+
+---
+
+## Installation
+
+Installation information here...
+
+---
+
+## Usage
+
+Usage information here...
+
+---
+
+## Contributor(s)
+
+* [{{.FullName}}](https://github.com/{{.GitHubUsername}}) - Creator, maintainer
+{{if .AddForkInfo}}
+---
+
+## Contribute
+
+All PR’s are welcome!
+
+1. `fork` (https://github.com/{{.GitHubUsername}}/{{.RepositoryName}}/fork)
+1. Create your `branch` (`git checkout -b my-feature`)
+1. `commit` yours (`git commit -am 'add some functionality'`)
+1. `push` your `branch` (`git push origin my-feature`)
+1. Than create a new **Pull Request**!
+{{end}}{{if .AddLicense}}
+---
+
+## License
+
+This project is licensed under {{.License | Upper}}{{end}}{{if .AddCOC}}
+
+---
+
+This project is intended to be a safe, welcoming space for collaboration, and
+contributors are expected to adhere to the [code of conduct][coc].
+
+[coc]: https://github.com/{{.GitHubUsername}}/{{.RepositoryName}}/blob/main/CODE_OF_CONDUCT.md{{end}}
