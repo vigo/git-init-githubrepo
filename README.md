@@ -17,6 +17,12 @@ Create git repository for GitHub style:
 go get -u github.com/vigo/git-init-githubrepo
 ```
 
+or
+
+```bash
+brew install vigo/git-init-githubrepo/git-init-githubrepo
+```
+
 ---
 
 ## Usage
