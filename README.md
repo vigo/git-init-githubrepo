@@ -80,12 +80,13 @@ Command fetches some variables from git configuration as default.
 
 - `--full-name`: default is your `git config user.name` if exists
 - `--username`: default is your `git config github.user` if exists
-- `--email`: default is your `git config user.email` if exists. Email will be
-  used if `--add-coc` is true. (*for code of conduct text*)
-
-- `--add-license`: default is `mit`. If you don’t want to license your project
-  you need to pass empty string: `--add-license ""`
-
+- `--email`: default is your `git config user.email` if exists. Email will be used for `CODE_OF_CONDUCT` file.
+- `--license`: default license type is `mit`.
+- `--no-license` do not add license information to `README` and do not create `LICENSE` file
+- `--disable-fork`: do not add fork information to `README`
+- `--disable-bumpversion`: do not create `.bumpversion.cfg` file
+- `--disable-coc`: do not create add code of conduct information `README` and do not create `CODE_OF_CONDUCT` file
+ 
 Required flags are:
 
 - `--project-name`: Name of your project (*title of your project*)
@@ -114,7 +115,7 @@ For bash-completion add:
 eval "$(git-init-githubrepo --bash-completion)"
 ```
 
-to your bash profile!
+to your bash profile! (*bash completion automatically shipped with brew tap!*)
 
 ---
 
