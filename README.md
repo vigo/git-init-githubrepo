@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-0.1.1-orange.svg)
+![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)
 
 # GitHub Friendly Repo Creator/Initializer
 
