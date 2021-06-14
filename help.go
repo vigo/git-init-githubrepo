@@ -1,11 +1,7 @@
 package main
 
 var (
-	bashCompletion = `#! /bin/bash
-
-: ${PROG:=$(basename ${BASH_SOURCE})}
-
-_cli_bash_autocomplete() {
+	bashCompletion = `_git_init_githubrepo() {
   if [[ "${COMP_WORDS[0]}" != "source" ]]; then
     local cur opts base
     COMPREPLY=()
@@ -19,9 +15,6 @@ _cli_bash_autocomplete() {
     return 0
   fi
 }
-
-complete -o bashdefault -o default -o nospace -F _cli_bash_autocomplete $PROG
-unset PROG
 `
 
 	helpExtras = `

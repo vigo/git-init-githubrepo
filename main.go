@@ -90,8 +90,9 @@ func (l licenseTypes) String() string {
 
 func main() {
 	cli.VersionFlag = &cli.BoolFlag{
-		Name:  "version",
-		Usage: "version information",
+		Name:    "version",
+		Aliases: []string{"v"},
+		Usage:   "version information",
 	}
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)
@@ -111,43 +112,6 @@ func main() {
 				Name:  "Uğur \"vigo\" Özyılmazel",
 				Email: "ugurozyilmazel@gmail.com",
 			},
-		},
-		Before: func(c *cli.Context) error {
-			license := c.String("license")
-			addLicense := !c.Bool("no-license")
-			fullName := c.String("full-name")
-			username := c.String("username")
-			disableCOC := c.Bool("disable-coc")
-
-			if fullName == "" {
-				return cli.Exit("full name required", 1)
-			}
-			if username == "" {
-				return cli.Exit("username required", 1)
-			}
-
-			if addLicense {
-				licenseValid := false
-				for _, licenseType := range availableLicenses {
-					if license == licenseType {
-						licenseValid = true
-						break
-					}
-				}
-
-				if !licenseValid {
-					return cli.Exit(fmt.Sprintf("invalid license type: %s", license), 1)
-				}
-			}
-
-			if !disableCOC {
-				email := c.String("email")
-				if email == "" {
-					return cli.Exit("you need to provide email due to code of conduct choise!", 1)
-				}
-			}
-
-			return nil
 		},
 	}
 
@@ -175,16 +139,14 @@ func main() {
 			Value:   getFromGitConfig("user.email"),
 		},
 		&cli.StringFlag{
-			Name:     "project-name",
-			Aliases:  []string{"p"},
-			Usage:    "`NAME` of your project",
-			Required: true,
+			Name:    "project-name",
+			Aliases: []string{"p"},
+			Usage:   "`NAME` of your project",
 		},
 		&cli.StringFlag{
-			Name:     "repository-name",
-			Aliases:  []string{"r"},
-			Usage:    "`NAME` of your GitHub repository",
-			Required: true,
+			Name:    "repository-name",
+			Aliases: []string{"r"},
+			Usage:   "`NAME` of your GitHub repository",
 		},
 		&cli.StringFlag{
 			Name:    "license",
@@ -218,11 +180,39 @@ func main() {
 			return nil
 		}
 
+		if c.String("project-name") == "" {
+			return cli.Exit("project name required", 1)
+		}
+		if c.String("repository-name") == "" {
+			return cli.Exit("repository name required", 1)
+		}
+		if c.String("full-name") == "" {
+			return cli.Exit("full name required", 1)
+		}
+		if c.String("username") == "" {
+			return cli.Exit("username required", 1)
+		}
+		if !c.Bool("no-license") {
+			licenseValid := false
+			for _, licenseType := range availableLicenses {
+				if c.String("license") == licenseType {
+					licenseValid = true
+					break
+				}
+			}
+			if !licenseValid {
+				return cli.Exit(fmt.Sprintf("invalid license type: %s", c.String("license")), 1)
+			}
+		}
+		if !c.Bool("disable-coc") {
+			if c.String("email") == "" {
+				return cli.Exit("you need to provide email due to code of conduct choise!", 1)
+			}
+		}
 		if err := commandExists("git"); err != nil {
 			fmt.Fprintf(os.Stderr, "you need to instal %q to continue...", "git")
 			os.Exit(1)
 		}
-
 		if inGITRepo() == nil {
 			fmt.Fprintln(os.Stderr, "you are now in a git repository!")
 			os.Exit(1)

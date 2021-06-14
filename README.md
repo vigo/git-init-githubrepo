@@ -34,7 +34,7 @@ USAGE:
    git-init-githubrepo [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.0
+   0.1.1
 
 AUTHOR:
    Uğur "vigo" Özyılmazel <ugurozyilmazel@gmail.com>
@@ -55,7 +55,7 @@ GLOBAL OPTIONS:
    --disable-bumpversion              do not create .bumpversion.cfg and badge to README (default: false)
    --disable-coc                      do not add CODE_OF_CONDUCT (default: false)
    --help, -h                         show help (default: false)
-   --version                          version information (default: false)
+   --version, -v                      version information (default: false)
 
 EXAMPLES:
   
@@ -68,7 +68,6 @@ EXAMPLES:
 NOTES:
   
   Currently, MIT license is available, more to come soon!
-
 ```
 
 Command fetches some variables from git configuration as default.
@@ -103,6 +102,13 @@ drwxr-xr-x  9 vigo wheel  288 Jun 14 13:15 .git
 -rwxr-xr-x  1 vigo wheel  942 Jun 14 13:15 README.md
 ```
 
+For bash-completion add:
+
+```bash
+eval "$(git-init-githubrepo --bash-completion)"
+```
+
+to your bash profile!
 
 ---
 
