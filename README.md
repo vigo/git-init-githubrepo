@@ -13,8 +13,10 @@ Create git repository for GitHub style:
 
 ## Installation
 
+Install from source;
+
 ```bash
-go get -u github.com/vigo/git-init-githubrepo
+go install github.com/vigo/git-init-githubrepo@latest
 ```
 
 or
