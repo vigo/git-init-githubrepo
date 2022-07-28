@@ -2,14 +2,16 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
+	"errors"
+	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"text/template"
 	"time"
-
-	_ "embed"
 
 	"github.com/urfave/cli/v2"
 	"github.com/vigo/git-init-githubrepo/version"
@@ -24,11 +26,14 @@ var templateCOC string
 //go:embed templates/license/mit.gotxt
 var templateLicenseMIT string
 
+//go:embed templates/license/mit-na.gotxt
+var templateLicenseMITNA string
+
 //go:embed templates/bumpversion.cfg
 var templateBumpVersion string
 
-// ReadmeParams fields hold required data for README.md
-type ReadmeParams struct {
+// ReadmePlaceholder holds required params for README.md.
+type ReadmePlaceholder struct {
 	FullName       string
 	GitHubUsername string
 	ProjectName    string
@@ -40,7 +45,7 @@ type ReadmeParams struct {
 	AddBumpVersion bool
 }
 
-// LicenseMITParams fields hold required data LICENSE
+// LicenseMITParams fields hold required data LICENSE.
 type LicenseMITParams struct {
 	Year     int
 	FullName string
@@ -50,7 +55,36 @@ var templateFilters = template.FuncMap{
 	"Upper": strings.ToUpper,
 }
 
+var (
+	errInvalidLicense      = errors.New("invalid licence option")
+	errEmailRequired       = errors.New("email required")
+	errGitRequired         = errors.New("you need to install git")
+	errInGitRepo           = errors.New("you are now in a git repo")
+	errFolderExists        = errors.New("folder already exists")
+	errProjectNameRequired = errors.New("project name required")
+	errRepoNameRequired    = errors.New("repository name required")
+)
+
+type licenseTypes map[string]string
+
+func (l licenseTypes) String() string {
+	var ks []string
+	for key := range l {
+		ks = append(ks, key)
+	}
+	return strings.Join(ks, ",")
+}
+
+var availableLicenses = licenseTypes{
+	"mit":    "MIT",
+	"mit-na": "MIT No Attribution",
+}
+
 func getFromGitConfig(configName string) string {
+	if flag.Lookup("test.v") != nil {
+		return ""
+	}
+
 	buff := &bytes.Buffer{}
 
 	cmd := exec.Command("git", "config", configName)
@@ -64,31 +98,57 @@ func getFromGitConfig(configName string) string {
 }
 
 func commandExists(exe string) error {
-	return exec.Command("command", "-v", exe).Run()
+	_, err := exec.LookPath(exe)
+	return err // nolint:wrapcheck
 }
 
 func inGITRepo() error {
-	return exec.Command("git", "rev-parse", "--git-dir").Run()
+	if flag.Lookup("test.v") != nil {
+		_ = os.Chdir(os.TempDir())
+	}
+
+	return exec.Command("git", "rev-parse", "--git-dir").Run() // nolint:wrapcheck
 }
 
 func gitInit(path string) error {
-	return exec.Command("git", "init", path).Run()
+	return exec.Command("git", "init", path).Run() // nolint:wrapcheck
 }
 
-type licenseTypes []string
-
-func (l licenseTypes) String() string {
-	o := ""
-	for i, typeName := range l {
-		o = o + typeName
-		if i+1 < len(l) {
-			o = o + ","
-		}
+func createFile(s interface{}, fileName string, ts string) error {
+	tmpl, err := template.New(fileName).Funcs(templateFilters).Parse(ts)
+	if err != nil {
+		return fmt.Errorf("%w", err)
 	}
-	return o
+
+	f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0o0600) // nolint:gosec
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	err = tmpl.Execute(f, s)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+	if err := f.Close(); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	return nil
 }
 
-func main() {
+func getCWD() (string, error) {
+	if flag.Lookup("test.v") != nil {
+		tmpDir := strings.TrimRight(os.TempDir(), string(os.PathSeparator))
+		return tmpDir, nil
+	}
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("%w", err)
+	}
+	return cwd, nil
+}
+
+func run(args []string, wr io.Writer) error {
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:    "version",
 		Aliases: []string{"v"},
@@ -97,10 +157,7 @@ func main() {
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)
 	}
-
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, helpExtras)
-
-	availableLicenses := licenseTypes{"mit"}
 
 	app := &cli.App{
 		EnableBashCompletion: true,
@@ -108,11 +165,12 @@ func main() {
 		Usage:                "create git repository with built-in README, LICENSE and more...",
 		Compiled:             time.Now(),
 		Authors: []*cli.Author{
-			&cli.Author{
+			{
 				Name:  "Uğur \"vigo\" Özyılmazel",
 				Email: "ugurozyilmazel@gmail.com",
 			},
 		},
+		Writer: wr,
 	}
 
 	flags := []cli.Flag{
@@ -151,8 +209,13 @@ func main() {
 		&cli.StringFlag{
 			Name:    "license",
 			Aliases: []string{"l"},
-			Usage:   fmt.Sprintf("add `LICENSE`. available license(s): %s", availableLicenses),
+			Usage:   "add `LICENSE`",
 			Value:   "mit",
+		},
+		&cli.BoolFlag{
+			Name:    "list-licenses",
+			Aliases: []string{"ll"},
+			Usage:   "list licenses",
 		},
 		&cli.BoolFlag{
 			Name:  "no-license",
@@ -180,61 +243,61 @@ func main() {
 			return nil
 		}
 
-		if c.String("project-name") == "" {
-			return cli.Exit("project name required", 1)
-		}
-		if c.String("repository-name") == "" {
-			return cli.Exit("repository name required", 1)
-		}
-		if c.String("full-name") == "" {
-			return cli.Exit("full name required", 1)
-		}
-		if c.String("username") == "" {
-			return cli.Exit("username required", 1)
-		}
-		if !c.Bool("no-license") {
-			licenseValid := false
-			for _, licenseType := range availableLicenses {
-				if c.String("license") == licenseType {
-					licenseValid = true
-					break
-				}
+		if c.Bool("list-licenses") {
+			t := []string{"available licence types are:"}
+			for k, v := range availableLicenses {
+				t = append(t, "  - `"+k+"`: "+v)
 			}
-			if !licenseValid {
-				return cli.Exit(fmt.Sprintf("invalid license type: %s", c.String("license")), 1)
-			}
+			fmt.Fprintln(c.App.Writer, strings.Join(t, "\n"))
+			return nil
 		}
-		if !c.Bool("disable-coc") {
-			if c.String("email") == "" {
-				return cli.Exit("you need to provide email due to code of conduct choise!", 1)
-			}
-		}
+
 		if err := commandExists("git"); err != nil {
-			fmt.Fprintf(os.Stderr, "you need to instal %q to continue...", "git")
-			os.Exit(1)
+			return errGitRequired
 		}
+
 		if inGITRepo() == nil {
-			fmt.Fprintln(os.Stderr, "you are now in a git repository!")
-			os.Exit(1)
+			return errInGitRepo
 		}
 
-		// check folder exists?
-		cwd, err := os.Getwd()
+		if c.String("project-name") == "" {
+			return errProjectNameRequired
+		}
+
+		if c.String("repository-name") == "" {
+			return errRepoNameRequired
+		}
+
+		if !c.Bool("no-license") {
+			_, ok := availableLicenses[c.String("license")]
+			if !ok {
+				return errInvalidLicense
+			}
+		}
+
+		if !c.Bool("disable-coc") && c.String("email") == "" {
+			return errEmailRequired
+		}
+
+		cwd, err := getCWD()
 		if err != nil {
-			return cli.Exit(err, 1)
+			return fmt.Errorf("%w", err)
 		}
-		targetFolder := cwd + "/" + c.String("repository-name")
+
+		targetFolder := strings.Join([]string{
+			cwd,
+			c.String("repository-name"),
+		}, string(os.PathSeparator))
+
 		if _, err := os.Stat(targetFolder); !os.IsNotExist(err) {
-			return cli.Exit(fmt.Sprintf("folder %q already exists!", targetFolder), 1)
+			return errFolderExists
 		}
 
-		// git init
 		if err := gitInit(c.String("repository-name")); err != nil {
-			return cli.Exit(err, 1)
+			return fmt.Errorf("%w", err)
 		}
 
-		// create files under folder
-		readmeParams := &ReadmeParams{
+		p := ReadmePlaceholder{
 			FullName:       c.String("full-name"),
 			GitHubUsername: c.String("username"),
 			ProjectName:    c.String("project-name"),
@@ -245,37 +308,61 @@ func main() {
 			AddCOC:         !c.Bool("disable-coc"),
 			AddBumpVersion: !c.Bool("disable-bumpversion"),
 		}
-		// create README
-		if err := createFile(readmeParams, targetFolder+"/README.md", templateReadme); err != nil {
-			return cli.Exit(err, 1)
+		readmeFilePath := strings.Join([]string{
+			targetFolder,
+			"README.md",
+		}, string(os.PathSeparator))
+
+		if err := createFile(&p, readmeFilePath, templateReadme); err != nil {
+			return fmt.Errorf("%w", err)
 		}
 
-		// create CODE_OF_CONDUCT
-		if readmeParams.AddCOC {
-			if err := createFile(struct{ Email string }{c.String("email")}, targetFolder+"/CODE_OF_CONDUCT.md", templateCOC); err != nil {
-				return cli.Exit(err, 1)
+		if p.AddCOC {
+			cocFilePath := strings.Join([]string{
+				targetFolder,
+				"CODE_OF_CONDUCT.md",
+			}, string(os.PathSeparator))
+
+			if err := createFile(struct{ Email string }{c.String("email")}, cocFilePath, templateCOC); err != nil {
+				return fmt.Errorf("%w", err)
 			}
 		}
 
-		// create LICENSE
-		if readmeParams.AddLicense {
-			switch readmeParams.License {
+		if p.AddLicense {
+			licenceFilePath := strings.Join([]string{
+				targetFolder,
+				"LICENSE",
+			}, string(os.PathSeparator))
+
+			switch p.License {
+			case "mit-na":
+				now := time.Now()
+				licenseParams := LicenseMITParams{
+					Year:     now.Year(),
+					FullName: p.FullName,
+				}
+				if err := createFile(&licenseParams, licenceFilePath, templateLicenseMITNA); err != nil {
+					return fmt.Errorf("%w", err)
+				}
 			case "mit":
 				now := time.Now()
-				licenseParams := &LicenseMITParams{
+				licenseParams := LicenseMITParams{
 					Year:     now.Year(),
-					FullName: readmeParams.FullName,
+					FullName: p.FullName,
 				}
-				if err := createFile(licenseParams, targetFolder+"/LICENSE.md", templateLicenseMIT); err != nil {
-					return cli.Exit(err, 1)
+				if err := createFile(&licenseParams, licenceFilePath, templateLicenseMIT); err != nil {
+					return fmt.Errorf("%w", err)
 				}
 			}
 		}
+		if p.AddBumpVersion {
+			bumpconfigFilePath := strings.Join([]string{
+				targetFolder,
+				".bumpversion.cfg",
+			}, string(os.PathSeparator))
 
-		// create .bumpversion.cfg
-		if readmeParams.AddBumpVersion {
-			if err := createFile(struct{}{}, targetFolder+"/.bumpversion.cfg", templateBumpVersion); err != nil {
-				return cli.Exit(err, 1)
+			if err := createFile(struct{}{}, bumpconfigFilePath, templateBumpVersion); err != nil {
+				return fmt.Errorf("%w", err)
 			}
 		}
 
@@ -283,31 +370,12 @@ func main() {
 		return nil
 	}
 
-	if err := app.Run(os.Args); err != nil {
+	return app.Run(args) // nolint:wrapcheck
+}
+
+func main() {
+	if err := run(os.Args, nil); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-
-}
-
-func createFile(s interface{}, fileName string, ts string) error {
-	tmpl, err := template.New(fileName).Funcs(templateFilters).Parse(ts)
-	if err != nil {
-		return err
-	}
-
-	f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-
-	err = tmpl.Execute(f, s)
-	if err != nil {
-		return err
-	}
-	if err := f.Close(); err != nil {
-		return err
-	}
-
-	return nil
 }

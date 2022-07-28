@@ -1,0 +1,44 @@
+name: build and test
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.18
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.18
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: go mod download
+
+    - name: Run tests
+      run: |
+        go test -v .
+
+    - name: Build app
+      id: build_go_app
+      run: |
+        go build -v .
+        echo ::set-output name=exit_code::$?
+
+    - name: Notify Slack on success
+      if: steps.build_go_app.outputs.exit_code == 0
+      id: slack_notification
+      uses: ravsamhq/notify-slack-action@v1
+      with:
+        status: ${{ job.status }}
+        notification_title: 'Build succeeded'
+        message_format: 'git-init-githubrepo build succeeded. <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
+        footer: 'repo: <{repo_url}|{repo}>'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

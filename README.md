@@ -1,4 +1,6 @@
 ![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)
+![GolangCI-Lint Status](https://github.com/vigo/git-init-githubrepo/actions/workflows/golang-lint.yml/badge.svg)
+![Go Build Status](https://github.com/vigo/git-init-githubrepo/actions/workflows/go.yml/badge.svg)
 
 # GitHub Friendly Repo Creator/Initializer
 
@@ -42,7 +44,7 @@ USAGE:
    git-init-githubrepo [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.1
+   0.2.0
 
 AUTHOR:
    Uğur "vigo" Özyılmazel <ugurozyilmazel@gmail.com>
@@ -52,18 +54,20 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --bash-completion                  generate bash-completion code (default: false)
-   --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "Uğur Özyılmazel")
-   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "vigo")
-   --email EMAIL, -e EMAIL            your contact EMAIL (default: "ugurozyilmazel@gmail.com")
-   --project-name NAME, -p NAME       NAME of your project
-   --repository-name NAME, -r NAME    NAME of your GitHub repository
-   --license LICENSE, -l LICENSE      add LICENSE. available license(s): mit (default: "mit")
-   --no-license                       do not add LICENSE file (default: false)
-   --disable-fork                     do not add fork information to README (default: false)
    --disable-bumpversion              do not create .bumpversion.cfg and badge to README (default: false)
    --disable-coc                      do not add CODE_OF_CONDUCT (default: false)
+   --disable-fork                     do not add fork information to README (default: false)
+   --email EMAIL, -e EMAIL            your contact EMAIL (default: "ugurozyilmazel@gmail.com")
+   --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "Uğur Özyılmazel")
    --help, -h                         show help (default: false)
+   --license LICENSE, -l LICENSE      add LICENSE (default: "mit")
+   --list-licenses, --ll              list licenses (default: false)
+   --no-license                       do not add LICENSE file (default: false)
+   --project-name NAME, -p NAME       NAME of your project
+   --repository-name NAME, -r NAME    NAME of your GitHub repository
+   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "vigo")
    --version, -v                      version information (default: false)
+   
 
 EXAMPLES:
   
@@ -73,10 +77,12 @@ EXAMPLES:
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --no-license
 
-NOTES:
-  
-  Currently, MIT license is available, more to come soon!
 ```
+
+Available license files:
+
+- `mit-na`: MIT No Attribution
+- `mit`: MIT
 
 Command fetches some variables from git configuration as default.
 

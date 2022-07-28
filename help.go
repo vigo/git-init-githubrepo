@@ -26,9 +26,5 @@ EXAMPLES:
 	$ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
 	$ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --no-license
 
-NOTES:
-	
-	Currently, MIT license is available, more to come soon!
-
 	`
 )
