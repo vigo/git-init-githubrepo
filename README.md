@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)
+![Version](https://img.shields.io/badge/version-0.3.0-orange.svg)
 ![GolangCI-Lint Status](https://github.com/vigo/git-init-githubrepo/actions/workflows/golang-lint.yml/badge.svg)
 ![Go Build Status](https://github.com/vigo/git-init-githubrepo/actions/workflows/go.yml/badge.svg)
 
