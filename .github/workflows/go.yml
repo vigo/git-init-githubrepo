@@ -9,21 +9,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.18
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.18
-      id: go
-
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: "go.mod"
+      id: go
 
     - name: Get dependencies
       run: go mod download
 
     - name: Run tests
       run: |
-        go test -v .
+        go test -v -coverprofile=coverage.txt -covermode=atomic .
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+       env: CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Build app
       id: build_go_app
