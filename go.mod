@@ -1,8 +1,8 @@
 module github.com/vigo/git-init-githubrepo
 
-go 1.18
+go 1.20
 
-require github.com/urfave/cli/v2 v2.11.1
+require github.com/urfave/cli/v2 v2.25.7
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
