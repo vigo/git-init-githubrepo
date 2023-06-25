@@ -1,6 +1,7 @@
 ![Version](https://img.shields.io/badge/version-0.3.2-orange.svg)
 ![GolangCI-Lint Status](https://github.com/vigo/git-init-githubrepo/actions/workflows/golang-lint.yml/badge.svg)
 ![Go Build Status](https://github.com/vigo/git-init-githubrepo/actions/workflows/go.yml/badge.svg)
+[![codecov](https://codecov.io/gh/vigo/git-init-githubrepo/branch/main/graph/badge.svg?token=QFA1S8DT00)](https://codecov.io/gh/vigo/git-init-githubrepo)
 
 # GitHub Friendly Repo Creator/Initializer
 
