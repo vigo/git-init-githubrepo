@@ -41,45 +41,48 @@ help :)
 $ git init-githubrepo -h
 
 NAME:
-   git-init-githubrepo - create git repository with built-in README, LICENSE and more...
+   git-init-githubrepo - create GitHub friendly git repository with built-in README, LICENSE and more...
 
 USAGE:
    git-init-githubrepo [global options] command [command options] [arguments...]
 
 VERSION:
-   0.2.0
+   <version-number>
 
 AUTHOR:
-   Uğur "vigo" Özyılmazel <ugurozyilmazel@gmail.com>
+   Uğur “vigo” Özyılmazel <ugurozyilmazel@gmail.com>
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --bash-completion                  generate bash-completion code (default: false)
-   --disable-bumpversion              do not create .bumpversion.cfg and badge to README (default: false)
-   --disable-coc                      do not add CODE_OF_CONDUCT (default: false)
-   --disable-fork                     do not add fork information to README (default: false)
-   --email EMAIL, -e EMAIL            your contact EMAIL (default: "ugurozyilmazel@gmail.com")
    --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "Uğur Özyılmazel")
-   --help, -h                         show help (default: false)
+   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "vigo")
+   --email EMAIL, -e EMAIL            your contact EMAIL (default: "ugurozyilmazel@gmail.com")
+   --project-name NAME, -p NAME       NAME of your project
+   --repository-name NAME, -r NAME    NAME of your GitHub repository
    --license LICENSE, -l LICENSE      add LICENSE (default: "mit")
    --list-licenses, --ll              list licenses (default: false)
    --no-license                       do not add LICENSE file (default: false)
-   --project-name NAME, -p NAME       NAME of your project
-   --repository-name NAME, -r NAME    NAME of your GitHub repository
-   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "vigo")
-   --version, -v                      version information (default: false)
-   
+   --disable-fork                     do not add fork information to README (default: false)
+   --disable-bumpversion              do not create .bumpversion.cfg and badge to README (default: false)
+   --disable-coc                      do not add CODE_OF_CONDUCT (default: false)
+   --help, -h                         show help
+   --version, -v                      print the version
+
+AVALILABLE LICENSES:
+
+  - `mit`: MIT
+  - `mit-na`: MIT No Attribution
 
 EXAMPLES:
-  
+
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world"
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --no-license
-
 ```
 
 Available license files:
@@ -97,7 +100,7 @@ Command fetches some variables from git configuration as default.
 - `--disable-fork`: do not add fork information to `README`
 - `--disable-bumpversion`: do not create `.bumpversion.cfg` file
 - `--disable-coc`: do not create add code of conduct information `README` and do not create `CODE_OF_CONDUCT` file
- 
+
 Required flags are:
 
 - `--project-name`: Name of your project (*title of your project*)
