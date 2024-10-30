@@ -1,94 +1,236 @@
 run:
+  tests: false
   concurrency: 4
-  timeout: 1m
-  go: '1.18'
+  go: '1.23'
 
 linters-settings:
-  prealloc:
-    simple: false
-    range-loops: false
-    for-loops: true
-
+  # ---------------------------------------------------------------------------
+  nestif:
+    min-complexity: 6
+  # ---------------------------------------------------------------------------
+  mnd:
+    ignored-numbers:
+      - '0'
+      - '2'
+  # ---------------------------------------------------------------------------
+  varnamelen:
+    min-name-length: 2
+    ignore-names:
+      - c
+      - i
+      - r
+      - w
+  # ---------------------------------------------------------------------------
+  errcheck:
+    check-type-assertions: true
+    # check-blank: true
+    exclude-functions:
+      - os.Setenv
+      - fmt.Fprint
+      - fmt.Fprintf
+      - fmt.Fprintln
+      - twerrors.(*TWError).Error
+  # ---------------------------------------------------------------------------
+  govet:
+    enable-all: true
+    settings:
+      shadow:
+        strict: true
+  # ---------------------------------------------------------------------------
+  wrapcheck:
+    ignoreSigs:
+      - .Errorf(
+      - errors.New(
+      - errors.Unwrap(
+      - errors.Join(
+      - .Wrap(
+      - .Wrapf(
+      - .WithMessage(
+      - .WithMessagef(
+      - .WithStack(
+      - .JSON
+      - .SendStatus
+      - services.HandleError
+    ignoreSigRegexps:
+      - \.New.*Error\(
+    ignorePackageGlobs:
+      - encoding/*
+      - github.com/pkg/*
+  # ---------------------------------------------------------------------------
+  gosec:
+    config:
+      G104:
+        os:
+          - Setenv
+        fmt:
+          - Fscanf
+  # ---------------------------------------------------------------------------
   revive:
     ignore-generated-header: true
     severity: warning
+    # enable-all-rules: true
     rules:
-      - name: exported
-        severity: warning
-      - name: error-return
-        severity: warning
-      - name: error-naming
-        severity: warning
-      - name: if-return
-        severity: warning
-      - name: var-naming
-        severity: warning
-      - name: var-declaration
-        severity: warning
-      - name: receiver-naming
-        severity: warning
-      - name: errorf
-        severity: warning
-      - name: empty-block
-        severity: warning
-      - name: unused-parameter
-        severity: warning
-      - name: unreachable-code
-        severity: warning
-      - name: redefines-builtin-id
-        severity: warning
-      - name: superfluous-else
-        severity: warning
-      - name: unexported-return
-        severity: warning
-      - name: indent-error-flow
-        severity: warning
+      - name: atomic
+      - name: bool-literal-in-expr
       - name: blank-imports
-        severity: warning
-      - name: range
-        severity: warning
-      - name: time-naming
-        severity: warning
+      - name: comment-spacings
+      - name: confusing-naming
+      - name: confusing-results
       - name: context-as-argument
-        severity: warning
+        arguments:
+          - allowTypesBefore: "*testing.T"
       - name: context-keys-type
-        severity: warning
+      - name: datarace
+      - name: deep-exit
+      - name: defer
+        arguments:
+          - ["call-chain", "loop"]
+      - name: dot-imports
+      - name: duplicated-imports
+      - name: early-return
+        arguments:
+          - "preserveScope"
+      - name: empty-block
+      - name: empty-lines
+      - name: error-naming
+      - name: error-return
+      - name: error-strings
+      - name: errorf
+      - name: exported
+      - name: get-return
+      - name: identical-branches
+      - name: if-return
+      - name: import-alias-naming
+        arguments:
+          - "^[a-z][a-z0-9]{0,}$"
+      - name: import-shadowing
+      - name: increment-decrement
       - name: indent-error-flow
-        severity: warning
-      - name: waitgroup-by-value
-        severity: warning
-      - name: useless-break
-        severity: warning
+        arguments:
+          - "preserveScope"
+      # - name: line-length-limit
+      #   arguments: [120]   # matches GOLINES
+      - name: modifies-parameter
+      - name: modifies-value-receiver
+      - name: optimize-operands-order
+      - name: range
+      - name: range-val-address
+      - name: range-val-in-closure
+      - name: receiver-naming
+      - name: redefines-builtin-id
+      - name: redundant-import-alias
+      - name: string-of-int
       - name: struct-tag
-        severity: warning
+        arguments:
+          - "json,inline"
+          - "bson,outline,gnu"
+      - name: superfluous-else
+        arguments:
+          - "preserveScope"
+      - name: time-equal
+      - name: time-naming
+      - name: unchecked-type-assertion
+        arguments:
+          - acceptIgnoredAssertionResult: true
+      - name: unconditional-recursion
+      - name: unexported-naming
+      - name: unexported-return
+      - name: unhandled-error
+        arguments:
+          - "fmt.Printf"
+          - "fmt.Println"
+          - "fmt.Fprintf"
+          - "fmt.Fprint"
+          - "fmt.Fprintln"
+          - "os.Setenv"
+      - name: unnecessary-stmt
+      - name: unreachable-code
+      - name: unused-parameter
+        arguments:
+          - allowRegex: "^_"
+      - name: unused-receiver
+      - name: use-any
+      - name: useless-break
+      - name: var-declaration
+      - name: var-naming
+        arguments:
+          - ["ID"] # AllowList
+          - ["VM"] # DenyList
+          - - upperCaseConst: true
+      - name: waitgroup-by-value
+  # ---------------------------------------------------------------------------
 
 linters:
   disable-all: true
   enable:
-    - asciicheck 
-    - durationcheck 
-    - errcheck 
-    - errorlint 
-    - exhaustive 
-    - gosec 
-    - govet 
-    - makezero 
-    - nilerr 
-    - rowserrcheck 
-    - exportloopref 
-    - sqlclosecheck 
-    - staticcheck 
-    - typecheck 
-    - bodyclose 
-    - noctx 
-    - prealloc
-    - gosimple
-  presets:
-    - comment 
-    - error 
-    - format 
-    - metalinter 
-    - unused
+    - asasalint                 # bugs
+    - asciicheck                # bugs, style
+    - bidichk                   # bugs
+    - bodyclose                 # bugs, performance
+    - copyloopvar               # style
+    - dupword                   # comment
+    - durationcheck             # bugs
+    - err113                    # error
+    - errcheck                  # [default] bugs, error
+    - errchkjson                # bugs
+    - errname                   # style
+    - errorlint                 # error
+    - wrapcheck                 # error
+    - exhaustive                # bugs
+    - forcetypeassert           # style
+    - gci                       # format, import
+    - gocheckcompilerdirectives # bugs
+    # - gochecknoglobals          # style
+    - goconst                   # style
+    - gocritic                  # style, metalinter
+    - godot                     # comment
+    - godox                     # comment
+    - gofmt                     # format
+    - gofumpt                   # format
+    - goimports                 # format
+    - goprintffuncname          # style
+    - gosec                     # bugs
+    - gosimple                  # [default] style
+    - govet                     # [default] bugs, metalinter
+    - inamedparam               # style
+    - ineffassign               # [default] unused
+    - intrange                  # style
+    - ireturn                   # style
+    # - lll                       # style (report long lines)
+    - loggercheck               # style, bugs
+    - makezero                  # style, bugs
+    - misspell                  # style, comment
+    - mnd                       # style
+    - musttag                   # style, bugs
+    - nakedret                  # style
+    - nestif                    # complexity
+    - nilerr                    # bugs
+    - nilnil                    # style
+    - nlreturn                  # style
+    - noctx                     # performance, bugs
+    - nolintlint                # style
+    - nonamedreturns            # style
+    - perfsprint                # performance
+    - prealloc                  # performance
+    - predeclared               # style
+    - protogetter               # bugs
+    - reassign                  # bugs
+    - revive                    # style, metalinter
+    - sloglint                  # format
+    - staticcheck               # [default] bugs, metalinter
+    - unused                    # [default] unused
+    - tenv                      # test
+    - testableexamples          # test
+    - testifylint               # test
+    - testpackage               # test
+    - unconvert                 # style
+    - unparam                   # unused
+    - varnamelen                # style
+    - wastedassign              # style
+    - wrapcheck                 # style, error
+    # - whitespace                # style
+    # - tagalign                  # format
 
 issues:
   exclude-use-default: false
+  fix: true

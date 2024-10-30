@@ -64,19 +64,21 @@ end
 namespace :test do
   desc 'run tests, generate coverage'
   task :run, [:verbose] do |_, args|
-    args.with_defaults(verbose: '')
-    system "go test -count=1 #{args.verbose} -coverprofile=coverage.out ./..."
+    args.with_defaults(verbose: '-v')
+    system %{
+      GOLANG_ENV=test go test -count=1 #{args.verbose} -coverprofile=coverage.out ./...
+    }
   end
-  
+
   desc "show coverage after running tests"
   task :show_coverage do
     Rake::Task["test:run"].invoke('-v')
     system "go tool cover -html=coverage.out"
   end
-  
+
   desc "update coverage value in README"
   task :update_coverage => [:has_gsed] do
-    coverage_value = `go test -count=1 -coverprofile=coverage.out ./... | grep 'ok'`.chomp.split("\t")
+    coverage_value = `GOLANG_ENV=test go test -count=1 -coverprofile=coverage.out ./... | grep 'ok'`.chomp.split("\t")
     coverage_ratio = coverage_value.last.split[1].gsub!('%', '%25')
     system %{
       gsed -i -r 's/coverage-[0-9\.\%]+/coverage-#{coverage_ratio}/' README.md &&
@@ -94,10 +96,10 @@ desc "Release new version #{AVAILABLE_REVISIONS.join(',')}, default: patch"
 task :release, [:revision] => [:repo_clean] do |_, args|
   args.with_defaults(revision: 'patch')
   Rake::Task['bump'].invoke(args.revision)
-  
+
   current_branch = "#{Rake::Task['get_current_branch'].invoke.first.call}"
   current_git_tag = "v#{Rake::Task['current_version'].execute.first.call}"
-  
+
   system %(
     git push origin #{current_branch} &&
     echo "-> push to #{current_branch}" &&
@@ -106,3 +108,13 @@ task :release, [:revision] => [:repo_clean] do |_, args|
   )
 end
 # -----------------------------------------------------------------------------
+
+desc "build for test"
+task :build_for_test do
+  system %{
+    go build -o git-init-githubrepo cmd/main.go &&
+    echo "build git-init-githubrepo complete" &&
+    mv ./git-init-githubrepo /tmp/ &&
+    echo "moved to /tmp/git-init-githubrepo"
+  }
+end
