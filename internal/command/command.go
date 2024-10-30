@@ -83,8 +83,13 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 	if err := kommand.checkDefaults(); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
+	extrasAvailableLicenses := make([]string, 0, len(availableLicenseTypes))
+	for k, v := range availableLicenseTypes {
+		extrasAvailableLicenses = append(extrasAvailableLicenses, fmt.Sprintf("  - `%s`: %s", k, v))
+	}
 
-	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelp)
+	extrasHelpFormatted := fmt.Sprintf(extrasHelp, strings.Join(extrasAvailableLicenses, "\n"))
+	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)
 	}
