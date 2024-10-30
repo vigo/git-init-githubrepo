@@ -19,10 +19,10 @@ jobs:
     steps:
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version-file: "go.mod"
       id: go
@@ -37,7 +37,7 @@ jobs:
         go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -50,10 +50,10 @@ jobs:
     - name: Notify Slack on success
       if: steps.build_go_app.outputs.exit_code == 0
       id: slack_notification
-      uses: ravsamhq/notify-slack-action@v1
+      uses: ravsamhq/notify-slack-action@v2
       with:
         status: ${{ job.status }}
-        notification_title: 'Build succeeded'
+        notification_title: 'Build and test are succeeded'
         message_format: 'git-init-githubrepo build succeeded. <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
         footer: 'repo: <{repo_url}|{repo}>'
       env:
