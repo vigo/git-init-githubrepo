@@ -50,6 +50,7 @@ func (k *cmd) GenerateTextFromTemplate(fileName string, content any, templateStr
 
 	if k.writer == nil {
 		var file *os.File
+
 		file, err = os.OpenFile(filepath.Clean(fileName), os.O_RDWR|os.O_CREATE, filePerm)
 		if err != nil {
 			return fmt.Errorf("could not open file: %w", err)

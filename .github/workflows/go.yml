@@ -1,7 +1,16 @@
 name: build and test
+
 on:
-  push:
   pull_request:
+    paths:
+      - '**.go'
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '**'
+    paths:
+      - '**.go'
 
 jobs:
   build:
@@ -25,7 +34,7 @@ jobs:
       env:
         GOLANG_ENV: test
       run: |
-        go test -v -coverprofile=coverage.txt -covermode=atomic .
+        go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
