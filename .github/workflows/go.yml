@@ -22,6 +22,8 @@ jobs:
       run: go mod download
 
     - name: Run tests
+      env:
+        GOLANG_ENV: test
       run: |
         go test -v -coverprofile=coverage.txt -covermode=atomic .
 
@@ -33,7 +35,7 @@ jobs:
     - name: Build app
       id: build_go_app
       run: |
-        go build -v .
+        go build -v cmd/main.go
         echo ::set-output name=exit_code::$?
 
     - name: Notify Slack on success

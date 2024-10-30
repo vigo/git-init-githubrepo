@@ -45,6 +45,9 @@ func (k *cmd) GenerateTextFromTemplate(fileName string, content any, templateStr
 	}
 
 	var wr io.Writer
+
+	wr = k.writer
+
 	if k.writer == nil {
 		var file *os.File
 		file, err = os.OpenFile(filepath.Clean(fileName), os.O_RDWR|os.O_CREATE, filePerm)

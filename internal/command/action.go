@@ -115,7 +115,12 @@ func (k *cmd) actions() func(*cli.Context) error {
 					lkeys = append(lkeys, "`"+string(k)+"`")
 				}
 
-				return fmt.Errorf("%w `%s`. valid license arguments are: %s", ErrInvalidLicense, argLicense, strings.Join(lkeys, ", "))
+				return fmt.Errorf(
+					"%w `%s`. valid license arguments are: %s",
+					ErrInvalidLicense,
+					argLicense,
+					strings.Join(lkeys, ", "),
+				)
 			}
 		}
 
@@ -208,7 +213,6 @@ func (k *cmd) actions() func(*cli.Context) error {
 				return fmt.Errorf("could not generate %s file, %w", fnBumpVersion, err)
 			}
 		}
-
 		fmt.Fprintf(wr, "your new project is ready at %s\n", targetFolder)
 
 		return nil

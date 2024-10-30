@@ -64,8 +64,10 @@ end
 namespace :test do
   desc 'run tests, generate coverage'
   task :run, [:verbose] do |_, args|
-    args.with_defaults(verbose: '')
-    system "go test -count=1 #{args.verbose} -coverprofile=coverage.out ./..."
+    args.with_defaults(verbose: '-v')
+    system %{
+      GOLANG_ENV=test go test -count=1 #{args.verbose} -coverprofile=coverage.out ./...
+    }
   end
 
   desc "show coverage after running tests"
@@ -76,7 +78,7 @@ namespace :test do
 
   desc "update coverage value in README"
   task :update_coverage => [:has_gsed] do
-    coverage_value = `go test -count=1 -coverprofile=coverage.out ./... | grep 'ok'`.chomp.split("\t")
+    coverage_value = `GOLANG_ENV=test go test -count=1 -coverprofile=coverage.out ./... | grep 'ok'`.chomp.split("\t")
     coverage_ratio = coverage_value.last.split[1].gsub!('%', '%25')
     system %{
       gsed -i -r 's/coverage-[0-9\.\%]+/coverage-#{coverage_ratio}/' README.md &&
