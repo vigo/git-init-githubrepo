@@ -1,6 +1,6 @@
 module github.com/vigo/git-init-githubrepo
 
-go 1.20
+go 1.23
 
 require github.com/urfave/cli/v2 v2.25.7
 

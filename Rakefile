@@ -106,3 +106,13 @@ task :release, [:revision] => [:repo_clean] do |_, args|
   )
 end
 # -----------------------------------------------------------------------------
+
+desc "build for test"
+task :build_for_test do
+  system %{
+    go build -o git-inittest cmd/main.go &&
+    echo "build git-inittest complete" &&
+    mv ./git-inittest /tmp/ &&
+    echo "moved to /tmp/git-inittest"
+  }
+end
