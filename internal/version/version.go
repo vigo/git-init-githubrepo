@@ -1,4 +1,4 @@
 package version
 
 // Version is the current version of git-init-repo.
-const Version string = "0.3.2"
+const Version string = "0.3.3"
