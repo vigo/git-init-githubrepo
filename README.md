@@ -71,15 +71,17 @@ GLOBAL OPTIONS:
    --help, -h                         show help
    --version, -v                      print the version
 
-AVALILABLE LICENSES (7):
+AVALILABLE LICENSES (9):
 
   - `apache-20`: Apache License 2.0
+  - `bsl-10`: Boost Software License 1.0
   - `gnu-agpl30`: GNU Affero General Public License v3.0
   - `gnu-gpl30`: GNU General Public License v3.0
   - `gnu-lgpl30`: GNU Lesser General Public License v3.0
   - `mit`: MIT
   - `mit-na`: MIT No Attribution
   - `moz-p20`: Mozilla Public License 2.0
+  - `unli`: The Unlicense
 
 EXAMPLES:
 
