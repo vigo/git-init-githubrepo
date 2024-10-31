@@ -39,6 +39,9 @@ var templateLicenseMOZP20 string
 //go:embed templates/license/apache-20.gotxt
 var templateLicenseAPACHE20 string
 
+//go:embed templates/license/bsl-10.gotxt
+var templateLicenseBSL10 string
+
 //go:embed templates/bumpversion.txt
 var templateBumpVersion string
 
@@ -88,6 +91,7 @@ const (
 	licenseGNULesserGPL30   = licenseType("gnu-lgpl30")
 	licenseMOZP20           = licenseType("moz-p20")
 	licenseAPACHE20         = licenseType("apache-20")
+	licenseBSL10            = licenseType("bsl-10")
 
 	fnReadme      = "README.md"
 	fnCOC         = "CODE_OF_CONDUCT.md"
@@ -111,6 +115,7 @@ var availableLicenseTypes = licenseTypes{
 	licenseGNULesserGPL30:   "GNU Lesser General Public License v3.0",
 	licenseMOZP20:           "Mozilla Public License 2.0",
 	licenseAPACHE20:         "Apache License 2.0",
+	licenseBSL10:            "Boost Software License 1.0",
 }
 
 func (k *cmd) actions() func(*cli.Context) error {
@@ -241,6 +246,10 @@ func (k *cmd) actions() func(*cli.Context) error {
 			now := time.Now()
 
 			switch readmeVars.License {
+			case licenseBSL10.String():
+				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseBSL10); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
 			case licenseAPACHE20.String():
 				licenseParams := licenseAPACHEVariables{
 					FullName: argFullName,
