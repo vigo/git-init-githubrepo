@@ -12,7 +12,7 @@ Create git repository for GitHub style:
 - `README.md` (as seen here!)
 - `LICENSE` (optional, currently MIT only)
 - `CODE_OF_CONDUCT.md` (optional)
-- `.bumpversion.cfg` file injection (optional)
+- `.bumpversion.toml` file injection (optional)
 
 ---
 
@@ -121,7 +121,7 @@ total 16K
 drwxr-xr-x  7 vigo wheel  224 Jun 14 13:15 .
 drwxrwxrwt 23 root wheel  736 Jun 14 13:15 ..
 drwxr-xr-x  9 vigo wheel  288 Jun 14 13:15 .git
--rwxr-xr-x  1 vigo wheel  182 Jun 14 13:15 .bumpversion.cfg
+-rwxr-xr-x  1 vigo wheel  182 Jun 14 13:15 .bumpversion.toml
 -rwxr-xr-x  1 vigo wheel 3.2K Jun 14 13:15 CODE_OF_CONDUCT.md
 -rwxr-xr-x  1 vigo wheel 1.1K Jun 14 13:15 LICENSE.md
 -rwxr-xr-x  1 vigo wheel  942 Jun 14 13:15 README.md
