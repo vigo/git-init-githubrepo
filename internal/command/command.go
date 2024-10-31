@@ -103,7 +103,11 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		)
 	}
 
-	extrasHelpFormatted := fmt.Sprintf(extrasHelp, strings.Join(extrasAvailableLicenses, "\n"))
+	extrasHelpFormatted := fmt.Sprintf(
+		extrasHelp,
+		len(availableLicenseTypes),
+		strings.Join(extrasAvailableLicenses, "\n"),
+	)
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)

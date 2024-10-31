@@ -71,10 +71,15 @@ GLOBAL OPTIONS:
    --help, -h                         show help
    --version, -v                      print the version
 
-AVALILABLE LICENSES:
+AVALILABLE LICENSES (7):
 
+  - `apache-20`: Apache License 2.0
+  - `gnu-agpl30`: GNU Affero General Public License v3.0
+  - `gnu-gpl30`: GNU General Public License v3.0
+  - `gnu-lgpl30`: GNU Lesser General Public License v3.0
   - `mit`: MIT
   - `mit-na`: MIT No Attribution
+  - `moz-p20`: Mozilla Public License 2.0
 
 EXAMPLES:
 
@@ -83,6 +88,8 @@ EXAMPLES:
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --no-license
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license gnu-agpl30
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license moz-p20
 ```
 
 Available license files:
