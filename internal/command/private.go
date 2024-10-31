@@ -55,13 +55,6 @@ func (k *cmd) checkDefaults() error {
 		k.gitHubUserName = gitHubUserName
 	}
 
-	if os.Getenv("GOLANG_ENV") == "test" {
-		_ = os.Chdir(os.TempDir())
-	}
-	if existingRepoPath, _ := k.runGITCommand("rev-parse", "--git-dir"); existingRepoPath != "" {
-		return ErrAlreadyInAGitRepo
-	}
-
 	return nil
 }
 
