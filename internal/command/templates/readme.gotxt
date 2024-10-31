@@ -44,7 +44,7 @@ All PR’s are welcome!
 
 ## License
 
-This project is licensed under {{.License | Upper}}{{end}}{{if .AddCOC}}
+This project is licensed under {{.LicenseDescription}} ({{.License | Upper}}){{end}}{{if .AddCOC}}
 
 ---
 

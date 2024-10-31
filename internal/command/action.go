@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -23,6 +24,27 @@ var templateLicenseMIT string
 //go:embed templates/license/mit-na.gotxt
 var templateLicenseMITNA string
 
+//go:embed templates/license/gnu-affero-gpl-30.gotxt
+var templateLicenseGNUAfferoGPL30 string
+
+//go:embed templates/license/gnu-lesser-gpl-30.gotxt
+var templateLicenseGNULesserGPL30 string
+
+//go:embed templates/license/gnu-gpl-30.gotxt
+var templateLicenseGNUGPL30 string
+
+//go:embed templates/license/mozilla-public-20.gotxt
+var templateLicenseMOZP20 string
+
+//go:embed templates/license/apache-20.gotxt
+var templateLicenseAPACHE20 string
+
+//go:embed templates/license/bsl-10.gotxt
+var templateLicenseBSL10 string
+
+//go:embed templates/license/the-unlicense.gotxt
+var templateLicenseTHEUNL string
+
 //go:embed templates/bumpversion.txt
 var templateBumpVersion string
 
@@ -35,16 +57,28 @@ type (
 		Year     int
 	}
 
+	licenseGNUGPL30Variables struct {
+		FullName    string
+		ProjectName string
+		Year        int
+	}
+
+	licenseAPACHEVariables struct {
+		FullName string
+		Year     int
+	}
+
 	readmeVariables struct {
-		FullName       string
-		GitHubUsername string
-		ProjectName    string
-		RepositoryName string
-		License        string
-		AddLicense     bool
-		AddForkInfo    bool
-		AddCOC         bool
-		AddBumpVersion bool
+		FullName           string
+		GitHubUsername     string
+		ProjectName        string
+		RepositoryName     string
+		License            string
+		LicenseDescription string
+		AddLicense         bool
+		AddForkInfo        bool
+		AddCOC             bool
+		AddBumpVersion     bool
 	}
 )
 
@@ -55,6 +89,13 @@ func (lt licenseType) String() string {
 const (
 	licenseMIT              = licenseType("mit")
 	licenseMITNoAttribution = licenseType("mit-na")
+	licenseGNUAfferoGPL30   = licenseType("gnu-agpl30")
+	licenseGNUGPL30         = licenseType("gnu-gpl30")
+	licenseGNULesserGPL30   = licenseType("gnu-lgpl30")
+	licenseMOZP20           = licenseType("moz-p20")
+	licenseAPACHE20         = licenseType("apache-20")
+	licenseBSL10            = licenseType("bsl-10")
+	licenseTHEUNL           = licenseType("unli")
 
 	fnReadme      = "README.md"
 	fnCOC         = "CODE_OF_CONDUCT.md"
@@ -73,6 +114,13 @@ var (
 var availableLicenseTypes = licenseTypes{
 	licenseMIT:              "MIT",
 	licenseMITNoAttribution: "MIT No Attribution",
+	licenseGNUAfferoGPL30:   "GNU Affero General Public License v3.0",
+	licenseGNUGPL30:         "GNU General Public License v3.0",
+	licenseGNULesserGPL30:   "GNU Lesser General Public License v3.0",
+	licenseMOZP20:           "Mozilla Public License 2.0",
+	licenseAPACHE20:         "Apache License 2.0",
+	licenseBSL10:            "Boost Software License 1.0",
+	licenseTHEUNL:           "The Unlicense",
 }
 
 func (k *cmd) actions() func(*cli.Context) error {
@@ -87,12 +135,26 @@ func (k *cmd) actions() func(*cli.Context) error {
 
 		if c.Bool("list-licenses") {
 			fmt.Fprintf(wr, "\n%s: %d\n\n", "available license(s)", len(availableLicenseTypes))
-			for k, v := range availableLicenseTypes {
-				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, v)
+
+			keys := make([]string, 0, len(availableLicenseTypes))
+			for k := range availableLicenseTypes {
+				keys = append(keys, k.String())
+			}
+			sort.Strings(keys)
+
+			for _, k := range keys {
+				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes[licenseType(k)])
 			}
 			fmt.Fprintln(wr, "")
 
 			return nil
+		}
+
+		if os.Getenv("GOLANG_ENV") == "test" {
+			_ = os.Chdir(os.TempDir())
+		}
+		if existingRepoPath, _ := k.runGITCommand("rev-parse", "--git-dir"); existingRepoPath != "" {
+			return ErrAlreadyInAGitRepo
 		}
 
 		argProjectName := c.String("project-name")
@@ -143,17 +205,19 @@ func (k *cmd) actions() func(*cli.Context) error {
 		argDisableFork := c.Bool("disable-fork")
 		argDisableCOC := c.Bool("disable-coc")
 		argDisableBumpVersion := c.Bool("disable-bumpversion")
+		argLicenseDescription := availableLicenseTypes[licenseType(argLicense)]
 
 		readmeVars := readmeVariables{
-			FullName:       argFullName,
-			GitHubUsername: argUserName,
-			ProjectName:    argProjectName,
-			RepositoryName: argRepositoryName,
-			License:        argLicense,
-			AddLicense:     !argNoLicense,
-			AddForkInfo:    !argDisableFork,
-			AddCOC:         !argDisableCOC,
-			AddBumpVersion: !argDisableBumpVersion,
+			FullName:           argFullName,
+			GitHubUsername:     argUserName,
+			ProjectName:        argProjectName,
+			RepositoryName:     argRepositoryName,
+			License:            argLicense,
+			LicenseDescription: argLicenseDescription,
+			AddLicense:         !argNoLicense,
+			AddForkInfo:        !argDisableFork,
+			AddCOC:             !argDisableCOC,
+			AddBumpVersion:     !argDisableBumpVersion,
 		}
 
 		readmeFilePath := strings.Join(
@@ -184,9 +248,52 @@ func (k *cmd) actions() func(*cli.Context) error {
 				string(os.PathSeparator),
 			)
 
+			now := time.Now()
+
 			switch readmeVars.License {
+			case licenseTHEUNL.String():
+				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseTHEUNL); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
+			case licenseBSL10.String():
+				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseBSL10); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
+			case licenseAPACHE20.String():
+				licenseParams := licenseAPACHEVariables{
+					FullName: argFullName,
+					Year:     now.Year(),
+				}
+				if err := k.GenerateTextFromTemplate(licenseFilePath, &licenseParams, templateLicenseAPACHE20); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
+
+			case licenseMOZP20.String():
+				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseMOZP20); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
+			case licenseGNULesserGPL30.String():
+				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseGNULesserGPL30); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
+
+			case licenseGNUAfferoGPL30.String(), licenseGNUGPL30.String():
+				licenseParams := licenseGNUGPL30Variables{
+					FullName:    argFullName,
+					ProjectName: argProjectName,
+					Year:        now.Year(),
+				}
+				ltemp := templateLicenseGNUAfferoGPL30
+
+				if readmeVars.License == licenseGNUGPL30.String() {
+					ltemp = templateLicenseGNUGPL30
+				}
+
+				if err := k.GenerateTextFromTemplate(licenseFilePath, &licenseParams, ltemp); err != nil {
+					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
+				}
+
 			case licenseMIT.String(), licenseMITNoAttribution.String():
-				now := time.Now()
 				licenseParams := licenseMITVariables{
 					FullName: argFullName,
 					Year:     now.Year(),

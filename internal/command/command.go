@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 	"time"
@@ -87,12 +88,26 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 	if err := kommand.checkDefaults(); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
+
+	keys := make([]string, 0, len(availableLicenseTypes))
+	for k := range availableLicenseTypes {
+		keys = append(keys, k.String())
+	}
+	sort.Strings(keys)
+
 	extrasAvailableLicenses := make([]string, 0, len(availableLicenseTypes))
-	for k, v := range availableLicenseTypes {
-		extrasAvailableLicenses = append(extrasAvailableLicenses, fmt.Sprintf("  - `%s`: %s", k, v))
+	for _, k := range keys {
+		extrasAvailableLicenses = append(
+			extrasAvailableLicenses,
+			fmt.Sprintf("  - `%s`: %s", k, availableLicenseTypes[licenseType(k)]),
+		)
 	}
 
-	extrasHelpFormatted := fmt.Sprintf(extrasHelp, strings.Join(extrasAvailableLicenses, "\n"))
+	extrasHelpFormatted := fmt.Sprintf(
+		extrasHelp,
+		len(availableLicenseTypes),
+		strings.Join(extrasAvailableLicenses, "\n"),
+	)
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)
