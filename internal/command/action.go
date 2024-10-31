@@ -26,6 +26,9 @@ var templateLicenseMITNA string
 //go:embed templates/license/gnu-affero-gpl-30.gotxt
 var templateLicenseGNUAfferoGPL30 string
 
+//go:embed templates/license/gnu-gpl-30.gotxt
+var templateLicenseGNUGPL30 string
+
 //go:embed templates/bumpversion.txt
 var templateBumpVersion string
 
@@ -38,7 +41,7 @@ type (
 		Year     int
 	}
 
-	licenseGNUAfferoGPL30Variables struct {
+	licenseGNUGPL30Variables struct {
 		FullName    string
 		ProjectName string
 		Year        int
@@ -65,6 +68,7 @@ const (
 	licenseMIT              = licenseType("mit")
 	licenseMITNoAttribution = licenseType("mit-na")
 	licenseGNUAfferoGPL30   = licenseType("gnu-agpl30")
+	licenseGNUGPL30         = licenseType("gnu-gpl30")
 
 	fnReadme      = "README.md"
 	fnCOC         = "CODE_OF_CONDUCT.md"
@@ -84,6 +88,7 @@ var availableLicenseTypes = licenseTypes{
 	licenseMIT:              "MIT",
 	licenseMITNoAttribution: "MIT No Attribution",
 	licenseGNUAfferoGPL30:   "GNU Affero General Public License v3.0",
+	licenseGNUGPL30:         "GNU General Public License v3.0",
 }
 
 func (k *cmd) actions() func(*cli.Context) error {
@@ -198,13 +203,19 @@ func (k *cmd) actions() func(*cli.Context) error {
 			now := time.Now()
 
 			switch readmeVars.License {
-			case licenseGNUAfferoGPL30.String():
-				licenseParams := licenseGNUAfferoGPL30Variables{
+			case licenseGNUAfferoGPL30.String(), licenseGNUGPL30.String():
+				licenseParams := licenseGNUGPL30Variables{
 					FullName:    argFullName,
 					ProjectName: argProjectName,
 					Year:        now.Year(),
 				}
-				if err := k.GenerateTextFromTemplate(licenseFilePath, &licenseParams, templateLicenseGNUAfferoGPL30); err != nil {
+				ltemp := templateLicenseGNUAfferoGPL30
+
+				if readmeVars.License == licenseGNUGPL30.String() {
+					ltemp = templateLicenseGNUGPL30
+				}
+
+				if err := k.GenerateTextFromTemplate(licenseFilePath, &licenseParams, ltemp); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
 
