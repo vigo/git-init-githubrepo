@@ -94,11 +94,6 @@ EXAMPLES:
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license moz-p20
 ```
 
-Available license files:
-
-- `mit-na`: MIT No Attribution
-- `mit`: MIT
-
 Command fetches some variables from git configuration as default.
 
 - `--full-name`: default is your `git config user.name` if exists
