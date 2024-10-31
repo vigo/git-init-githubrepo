@@ -138,41 +138,176 @@ func Test(t *testing.T) {
 }
 
 func TestCreateAll(t *testing.T) {
-	input := []string{
-		"--full-name", "Uğur Özyılmazel",
-		"--username", "vigo",
-		"--email", "ugurozyilmazel@gmail.com",
-		"--project-name", "test",
-		"--repository-name", "repo",
+	testCases := []struct {
+		name            string
+		input           []string
+		lookupInLicense string
+		checkFiles      []string
+		err             error
+	}{
+		{
+			name: "create with default (mit) license",
+			input: []string{
+				"--full-name", "Uğur Özyılmazel",
+				"--username", "vigo",
+				"--email", "ugurozyilmazel@gmail.com",
+				"--project-name", "test",
+				"--repository-name", "repo",
+			},
+			lookupInLicense: "The MIT License",
+			checkFiles: []string{
+				"CODE_OF_CONDUCT.md",
+				"LICENSE",
+				".bumpversion.toml",
+				"README.md",
+			},
+			err: nil,
+		},
+		{
+			name: "create with apache-20 license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "apache-20",
+			},
+			lookupInLicense: "Apache License",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with bsl-10 license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "bsl-10",
+			},
+			lookupInLicense: "Boost Software License",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with gnu-agpl30 license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "gnu-agpl30",
+			},
+			lookupInLicense: "GNU AFFERO GENERAL PUBLIC LICENSE",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with gnu-gpl30 license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "gnu-gpl30",
+			},
+			lookupInLicense: "GNU GENERAL PUBLIC LICENSE",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with gnu-lgpl30 license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "gnu-lgpl30",
+			},
+			lookupInLicense: "GNU LESSER GENERAL PUBLIC LICENSE",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with mit-na license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "mit-na",
+			},
+			lookupInLicense: "MIT No Attribution",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with moz-p20 license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "moz-p20",
+			},
+			lookupInLicense: "Mozilla Public License Version 2.0",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
+		{
+			name: "create with unli license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--license", "unli",
+			},
+			lookupInLicense: "This is free and unencumbered",
+			checkFiles: []string{
+				"LICENSE",
+			},
+			err: nil,
+		},
 	}
 
-	args := os.Args[0:1]
-	args = append(args, input...)
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			args := os.Args[0:1]
+			args = append(args, testCase.input...)
 
-	cmd, err := command.New()
-	if err != nil {
-		t.Fatal(err)
-	}
+			cmd, err := command.New()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	if err := cmd.Run(args); err != nil {
-		t.Errorf("want: nil, got: %v", err)
-	}
+			if err := cmd.Run(args); err != nil {
+				t.Errorf("want: nil, got: %v", err)
+			}
 
-	checkFiles := []string{
-		"CODE_OF_CONDUCT.md",
-		"LICENSE",
-		".bumpversion.toml",
-		"README.md",
-	}
+			if testCase.checkFiles != nil {
+				for _, file := range testCase.checkFiles {
+					filePath := strings.Join([]string{tmpFolder, file}, string(os.PathSeparator))
+					if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+						t.Errorf("%s does not exists %v", filePath, err)
+					}
+				}
+			}
 
-	for _, file := range checkFiles {
-		filePath := strings.Join([]string{tmpFolder, file}, string(os.PathSeparator))
-		if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
-			t.Errorf("%s does not exists %v", filePath, err)
-		}
-	}
+			if testCase.lookupInLicense != "" {
+				filePath := strings.Join([]string{tmpFolder, "LICENSE"}, string(os.PathSeparator))
 
-	if err := os.RemoveAll(tmpFolder); err != nil {
-		t.Errorf("can not delete temp folder: %v", err)
+				data, err := os.ReadFile(filePath)
+				if err != nil {
+					t.Fatalf("can not open file: %v", err)
+				}
+
+				if !strings.Contains(string(data), testCase.lookupInLicense) {
+					t.Errorf("LICENSE does not contain: %s", testCase.lookupInLicense)
+				}
+			}
+
+			if err := os.RemoveAll(tmpFolder); err != nil {
+				t.Errorf("can not delete temp folder: %v", err)
+			}
+		})
 	}
 }
