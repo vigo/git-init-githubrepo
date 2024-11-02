@@ -75,7 +75,7 @@ func (k *cmd) runGITCommand(args ...string) (string, error) {
 	}
 
 	if err := execCmd.Wait(); err != nil {
-		return "", fmt.Errorf("can npt wait git command: %w", err)
+		return "", fmt.Errorf("can not wait git command: %w", err)
 	}
 
 	return strings.TrimSpace(out.String()), nil
