@@ -89,6 +89,16 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		return nil, fmt.Errorf("%w", err)
 	}
 
+	if kommand.gitHubUserName == "" {
+		kommand.gitHubUserName = "your-github-username"
+	}
+	if kommand.gitUserFullName == "" {
+		kommand.gitUserFullName = "Your Full Name"
+	}
+	if kommand.gitUserEmail == "" {
+		kommand.gitUserEmail = "your@email"
+	}
+
 	keys := make([]string, 0, len(availableLicenseTypes))
 	for k := range availableLicenseTypes {
 		keys = append(keys, k.String())
