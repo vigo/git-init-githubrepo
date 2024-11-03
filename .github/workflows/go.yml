@@ -41,6 +41,11 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
+    - name: List Directory Structure for Debugging
+      run: |
+        pwd
+        ls -R
+
     - name: Build app
       id: build_go_app
       run: |
