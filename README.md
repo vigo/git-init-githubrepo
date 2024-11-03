@@ -140,6 +140,7 @@ to your bash profile! (*bash completion automatically shipped with brew tap!*)
 ## Contributor(s)
 
 * [Uğur Özyılmazel](https://github.com/vigo) - Creator, maintainer
+* [Yiğithan Karabulut](https://github.com/yigithankarabulut) - Contributor
 
 ---
 
