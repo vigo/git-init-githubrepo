@@ -21,7 +21,7 @@ Create git repository for GitHub style:
 Install from source;
 
 ```bash
-go install github.com/vigo/git-init-githubrepo@latest
+go install github.com/vigo/git-init-githubrepo/cmd/git-init-githubrepo@latest
 ```
 
 or

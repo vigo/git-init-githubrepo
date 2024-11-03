@@ -112,7 +112,7 @@ end
 desc "build for test"
 task :build_for_test do
   system %{
-    go build -o git-init-githubrepo cmd/main.go &&
+    go build -o git-init-githubrepo cmd/git-init-githubrepo/main.go &&
     echo "build git-init-githubrepo complete" &&
     mv ./git-init-githubrepo /tmp/ &&
     echo "moved to /tmp/git-init-githubrepo"
