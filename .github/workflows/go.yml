@@ -44,7 +44,7 @@ jobs:
     - name: Build app
       id: build_go_app
       run: |
-        go build -v cmd/git-init-githubrepo/main.go
+        go build -v ./cmd/git-init-githubrepo
         echo ::set-output name=exit_code::$?
 
     - name: Notify Slack on success
