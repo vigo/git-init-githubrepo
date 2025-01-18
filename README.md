@@ -10,7 +10,7 @@
 Create git repository for GitHub style:
 
 - `README.md` (as seen here!)
-- `LICENSE` (optional, currently MIT only)
+- `LICENSE`
 - `CODE_OF_CONDUCT.md` (optional)
 - `.bumpversion.toml` file injection (optional)
 
@@ -57,9 +57,9 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --bash-completion                  generate bash-completion code (default: false)
-   --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "Uğur Özyılmazel")
-   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "vigo")
-   --email EMAIL, -e EMAIL            your contact EMAIL (default: "ugurozyilmazel@gmail.com")
+   --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "<your-default-full-name>")
+   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "<your-default-github-user-name>")
+   --email EMAIL, -e EMAIL            your contact EMAIL (default: "<your-default-email>")
    --project-name NAME, -p NAME       NAME of your project
    --repository-name NAME, -r NAME    NAME of your GitHub repository
    --license LICENSE, -l LICENSE      add LICENSE (default: "mit")
