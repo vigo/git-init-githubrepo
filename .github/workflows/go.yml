@@ -2,15 +2,9 @@ name: build and test
 
 on:
   pull_request:
-    paths:
-      - '**.go'
   push:
-    branches:
-      - main
     tags-ignore:
       - '**'
-    paths:
-      - '**.go'
 
 jobs:
   build:
@@ -37,9 +31,10 @@ jobs:
         go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        slug: vigo/git-init-githubrepo
 
     - name: Build app
       id: build_go_app
