@@ -2,15 +2,11 @@ name: build and test
 
 on:
   pull_request:
-    paths:
-      - '**.go'
   push:
     branches:
       - main
     tags-ignore:
       - '**'
-    paths:
-      - '**.go'
 
 jobs:
   build:
