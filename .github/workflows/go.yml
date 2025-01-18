@@ -40,16 +40,11 @@ jobs:
       id: build_go_app
       run: |
         go build -v -o git-init-githubrepo ./cmd/git-init-githubrepo
-        echo ::set-output name=exit_code::$?
+        echo "exit_code=$?" >> $GITHUB_ENV
+      outputs:
+        exit_code: ${{ env.exit_code }}
 
-    - name: Notify Slack on success
-      if: steps.build_go_app.outputs.exit_code == 0 && secrets.SLACK_WEBHOOK_URL != ""
-      id: slack_notification
-      uses: ravsamhq/notify-slack-action@v2
-      with:
-        status: ${{ job.status }}
-        notification_title: 'Build and test are succeeded'
-        message_format: 'git-init-githubrepo build succeeded. <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
-        footer: 'repo: <{repo_url}|{repo}>'
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+    - name: Check build exit code
+      run: |
+        echo "The exit code of the build is ${{ steps.build_go_app.outputs.exit_code }}"
+
