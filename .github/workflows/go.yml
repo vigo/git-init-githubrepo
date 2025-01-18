@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
 
     - name: Check out code into the Go module directory
@@ -40,11 +40,9 @@ jobs:
       id: build_go_app
       run: |
         go build -v -o git-init-githubrepo ./cmd/git-init-githubrepo
-        echo "exit_code=$?" >> $GITHUB_ENV
-      outputs:
-        exit_code: ${{ env.exit_code }}
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
 
     - name: Check build exit code
       run: |
-        echo "The exit code of the build is ${{ steps.build_go_app.outputs.exit_code }}"
+        echo "Build exit code ${{ steps.build_go_app.outputs.exit_code}}"
 
