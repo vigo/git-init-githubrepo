@@ -40,4 +40,11 @@ jobs:
       id: build_go_app
       run: |
         go build -v -o git-init-githubrepo ./cmd/git-init-githubrepo
-        echo ::set-output name=exit_code::$?
+        echo "exit_code=$?" >> $GITHUB_ENV
+      outputs:
+        exit_code: ${{ env.exit_code }}
+
+    - name: Check build exit code
+      run: |
+        echo "The exit code of the build is ${{ steps.build_go_app.outputs.exit_code }}"
+
