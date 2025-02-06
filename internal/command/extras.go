@@ -1,7 +1,7 @@
 package command
 
-var (
-	extrasBashCompletion = `_git_init_githubrepo() {
+func extrasBashCompletion() string {
+	return `_git_init_githubrepo() {
 	  if [[ "${COMP_WORDS[0]}" != "source" ]]; then
 	    local cur opts base
 	    COMPREPLY=()
@@ -16,8 +16,10 @@ var (
 	  fi
 	}
 	`
+}
 
-	extrasHelp = `
+func extrasHelp() string {
+	return `
 AVALILABLE LICENSES (%d):
 
 %s
@@ -33,6 +35,8 @@ EXAMPLES:
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license moz-p20
 
 `
+}
 
-	extrasAppUsage = `create GitHub friendly git repository with built-in README, LICENSE and more...`
-)
+func extrasAppUsage() string {
+	return `create GitHub friendly git repository with built-in README, LICENSE and more...`
+}

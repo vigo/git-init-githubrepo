@@ -32,6 +32,11 @@ func (c *cmd) getFlags() []cli.Flag {
 			Usage:   "`NAME` of your project",
 		},
 		&cli.StringFlag{
+			Name:    "project-type",
+			Aliases: []string{"pt"},
+			Usage:   "type of your project",
+		},
+		&cli.StringFlag{
 			Name:    "repository-name",
 			Aliases: []string{"r"},
 			Usage:   "`NAME` of your GitHub repository",

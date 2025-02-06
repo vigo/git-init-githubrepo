@@ -111,16 +111,18 @@ var (
 	ErrAlreadyFolderExists    = errors.New("folder already exists")
 )
 
-var availableLicenseTypes = licenseTypes{
-	licenseMIT:              "MIT",
-	licenseMITNoAttribution: "MIT No Attribution",
-	licenseGNUAfferoGPL30:   "GNU Affero General Public License v3.0",
-	licenseGNUGPL30:         "GNU General Public License v3.0",
-	licenseGNULesserGPL30:   "GNU Lesser General Public License v3.0",
-	licenseMOZP20:           "Mozilla Public License 2.0",
-	licenseAPACHE20:         "Apache License 2.0",
-	licenseBSL10:            "Boost Software License 1.0",
-	licenseTHEUNL:           "The Unlicense",
+func availableLicenseTypes() licenseTypes {
+	return licenseTypes{
+		licenseMIT:              "MIT",
+		licenseMITNoAttribution: "MIT No Attribution",
+		licenseGNUAfferoGPL30:   "GNU Affero General Public License v3.0",
+		licenseGNUGPL30:         "GNU General Public License v3.0",
+		licenseGNULesserGPL30:   "GNU Lesser General Public License v3.0",
+		licenseMOZP20:           "Mozilla Public License 2.0",
+		licenseAPACHE20:         "Apache License 2.0",
+		licenseBSL10:            "Boost Software License 1.0",
+		licenseTHEUNL:           "The Unlicense",
+	}
 }
 
 func (k *cmd) actions() func(*cli.Context) error {
@@ -128,22 +130,22 @@ func (k *cmd) actions() func(*cli.Context) error {
 		wr := c.App.Writer
 
 		if c.Bool("bash-completion") {
-			fmt.Fprintf(wr, "%s\n", extrasBashCompletion)
+			fmt.Fprintf(wr, "%s\n", extrasBashCompletion())
 
 			return nil
 		}
 
 		if c.Bool("list-licenses") {
-			fmt.Fprintf(wr, "\n%s: %d\n\n", "available license(s)", len(availableLicenseTypes))
+			fmt.Fprintf(wr, "\n%s: %d\n\n", "available license(s)", len(availableLicenseTypes()))
 
-			keys := make([]string, 0, len(availableLicenseTypes))
-			for k := range availableLicenseTypes {
+			keys := make([]string, 0, len(availableLicenseTypes()))
+			for k := range availableLicenseTypes() {
 				keys = append(keys, k.String())
 			}
 			sort.Strings(keys)
 
 			for _, k := range keys {
-				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes[licenseType(k)])
+				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes()[licenseType(k)])
 			}
 			fmt.Fprintln(wr, "")
 
@@ -168,9 +170,9 @@ func (k *cmd) actions() func(*cli.Context) error {
 		argNoLicense := c.Bool("no-license")
 		if !argNoLicense {
 			licenseAsType := licenseType(argLicense)
-			if _, ok := availableLicenseTypes[licenseAsType]; !ok {
-				lkeys := make([]string, 0, len(availableLicenseTypes))
-				for k := range availableLicenseTypes {
+			if _, ok := availableLicenseTypes()[licenseAsType]; !ok {
+				lkeys := make([]string, 0, len(availableLicenseTypes()))
+				for k := range availableLicenseTypes() {
 					lkeys = append(lkeys, "`"+string(k)+"`")
 				}
 
@@ -202,7 +204,7 @@ func (k *cmd) actions() func(*cli.Context) error {
 		argDisableFork := c.Bool("disable-fork")
 		argDisableCOC := c.Bool("disable-coc")
 		argDisableBumpVersion := c.Bool("disable-bumpversion")
-		argLicenseDescription := availableLicenseTypes[licenseType(argLicense)]
+		argLicenseDescription := availableLicenseTypes()[licenseType(argLicense)]
 
 		readmeVars := readmeVariables{
 			FullName:           argFullName,

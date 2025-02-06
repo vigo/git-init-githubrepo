@@ -14,8 +14,10 @@ import (
 	"github.com/vigo/git-init-githubrepo/internal/version"
 )
 
-var templateFilters = template.FuncMap{
-	"Upper": strings.ToUpper,
+func templateFilters() template.FuncMap {
+	return template.FuncMap{
+		"Upper": strings.ToUpper,
+	}
 }
 
 const filePerm = 0o0644
@@ -40,7 +42,7 @@ func (k *cmd) Run(args []string) error {
 }
 
 func (k *cmd) GenerateTextFromTemplate(fileName string, content any, templateString string) error {
-	tmpl, err := template.New(fileName).Funcs(templateFilters).Parse(templateString)
+	tmpl, err := template.New(fileName).Funcs(templateFilters()).Parse(templateString)
 	if err != nil {
 		return fmt.Errorf("could not parse template: %w", err)
 	}
@@ -99,23 +101,23 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		kommand.gitUserEmail = "your@email"
 	}
 
-	keys := make([]string, 0, len(availableLicenseTypes))
-	for k := range availableLicenseTypes {
+	keys := make([]string, 0, len(availableLicenseTypes()))
+	for k := range availableLicenseTypes() {
 		keys = append(keys, k.String())
 	}
 	sort.Strings(keys)
 
-	extrasAvailableLicenses := make([]string, 0, len(availableLicenseTypes))
+	extrasAvailableLicenses := make([]string, 0, len(availableLicenseTypes()))
 	for _, k := range keys {
 		extrasAvailableLicenses = append(
 			extrasAvailableLicenses,
-			fmt.Sprintf("  - `%s`: %s", k, availableLicenseTypes[licenseType(k)]),
+			fmt.Sprintf("  - `%s`: %s", k, availableLicenseTypes()[licenseType(k)]),
 		)
 	}
 
 	extrasHelpFormatted := fmt.Sprintf(
-		extrasHelp,
-		len(availableLicenseTypes),
+		extrasHelp(),
+		len(availableLicenseTypes()),
 		strings.Join(extrasAvailableLicenses, "\n"),
 	)
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
@@ -127,7 +129,7 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Writer:               kommand.writer,
-		Usage:                extrasAppUsage,
+		Usage:                extrasAppUsage(),
 		Compiled:             time.Now(),
 		Authors: []*cli.Author{
 			{
