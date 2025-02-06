@@ -1,9 +1,12 @@
 name: golangci-lint
+
 on:
-  push:
+  pull_request:
     paths:
       - '**.go'
-  pull_request:
+  push:
+    branches:
+      - main
     paths:
       - '**.go'
 
