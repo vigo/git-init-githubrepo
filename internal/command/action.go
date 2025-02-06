@@ -150,9 +150,6 @@ func (k *cmd) actions() func(*cli.Context) error {
 			return nil
 		}
 
-		if os.Getenv("GOLANG_ENV") == "test" {
-			_ = os.Chdir(os.TempDir())
-		}
 		if existingRepoPath, _ := k.runGITCommand("rev-parse", "--git-dir"); existingRepoPath != "" {
 			return ErrAlreadyInAGitRepo
 		}

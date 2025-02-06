@@ -135,7 +135,6 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 				Email: "ugurozyilmazel@gmail.com",
 			},
 		},
-		// Before:               commandBeforeAction,
 		Flags:  kommand.getFlags(),
 		Action: kommand.actions(),
 	}

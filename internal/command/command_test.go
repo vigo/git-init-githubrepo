@@ -21,7 +21,7 @@ func TestBashCompletion(t *testing.T) {
 		"--bash-completion",
 	}
 
-	args := os.Args[0:1]
+	args := os.Args[:1]
 	args = append(args, input...)
 
 	out := new(bytes.Buffer)
@@ -47,7 +47,7 @@ func TestListLicences(t *testing.T) {
 		"--list-licenses",
 	}
 
-	args := os.Args[0:1]
+	args := os.Args[:1]
 	args = append(args, input...)
 
 	out := new(bytes.Buffer)
@@ -71,7 +71,23 @@ func TestListLicences(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func Test_CLI_Some_flags(t *testing.T) {
+	originalDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+
+	tempDir := os.TempDir()
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("Failed to change directory to temp: %v", err)
+	}
+
+	defer func() {
+		if err := os.Chdir(originalDir); err != nil {
+			t.Fatalf("Failed to restore original directory: %v", err)
+		}
+	}()
+
 	testCases := []struct {
 		name  string
 		input []string
@@ -110,7 +126,7 @@ func Test(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			args := os.Args[0:1]
+			args := os.Args[:1]
 			args = append(args, testCase.input...)
 
 			out := new(bytes.Buffer)
@@ -138,6 +154,22 @@ func Test(t *testing.T) {
 }
 
 func TestCreateAll(t *testing.T) {
+	originalDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+
+	tempDir := os.TempDir()
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("Failed to change directory to temp: %v", err)
+	}
+
+	defer func() {
+		if err := os.Chdir(originalDir); err != nil {
+			t.Fatalf("Failed to restore original directory: %v", err)
+		}
+	}()
+
 	testCases := []struct {
 		name            string
 		input           []string
@@ -271,7 +303,7 @@ func TestCreateAll(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			args := os.Args[0:1]
+			args := os.Args[:1]
 			args = append(args, testCase.input...)
 
 			cmd, err := command.New()
