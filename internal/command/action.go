@@ -80,10 +80,16 @@ type (
 		AddCOC             bool
 		AddBumpVersion     bool
 	}
+	projectStyle  string
+	projectStyles map[projectStyle]string
 )
 
 func (lt licenseType) String() string {
 	return string(lt)
+}
+
+func (ps projectStyle) String() string {
+	return string(ps)
 }
 
 const (
@@ -96,6 +102,8 @@ const (
 	licenseAPACHE20         = licenseType("apache-20")
 	licenseBSL10            = licenseType("bsl-10")
 	licenseTHEUNL           = licenseType("unli")
+
+	projectStyleGo = projectStyle("go")
 
 	fnReadme      = "README.md"
 	fnCOC         = "CODE_OF_CONDUCT.md"
@@ -125,6 +133,13 @@ func availableLicenseTypes() licenseTypes {
 	}
 }
 
+func availableProjectStyles() projectStyles {
+	return projectStyles{
+		projectStyleGo: `creates .github/workflows/, linter and tester actions, 
+            golangci.yml, .pre-commit-config.yaml, dependabot.yml, .gitignore`,
+	}
+}
+
 func (k *cmd) actions() func(*cli.Context) error {
 	return func(c *cli.Context) error {
 		wr := c.App.Writer
@@ -146,6 +161,23 @@ func (k *cmd) actions() func(*cli.Context) error {
 
 			for _, k := range keys {
 				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes()[licenseType(k)])
+			}
+			fmt.Fprintln(wr, "")
+
+			return nil
+		}
+
+		if c.Bool("list-project-styles") {
+			fmt.Fprintf(wr, "\n%s: %d\n\n", "available project style(s)", len(availableProjectStyles()))
+
+			keys := make([]string, 0, len(availableProjectStyles()))
+			for k := range availableProjectStyles() {
+				keys = append(keys, k.String())
+			}
+			sort.Strings(keys)
+
+			for _, k := range keys {
+				fmt.Fprintf(wr, "    - `%s`: %s\n", k, availableProjectStyles()[projectStyle(k)])
 			}
 			fmt.Fprintln(wr, "")
 

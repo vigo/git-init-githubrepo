@@ -8,34 +8,40 @@ func (c *cmd) getFlags() []cli.Flag {
 			Name:  "bash-completion",
 			Usage: "generate bash-completion code",
 		},
+
 		&cli.StringFlag{
 			Name:    "full-name",
 			Aliases: []string{"f"},
 			Usage:   "your `FULLNAME`",
 			Value:   c.gitUserFullName,
 		},
+
 		&cli.StringFlag{
 			Name:    "username",
 			Aliases: []string{"u"},
 			Usage:   "your GitHub `USERNAME`",
 			Value:   c.gitHubUserName,
 		},
+
 		&cli.StringFlag{
 			Name:    "email",
 			Aliases: []string{"e"},
 			Usage:   "your contact `EMAIL`",
 			Value:   c.gitUserEmail,
 		},
+
 		&cli.StringFlag{
 			Name:    "project-name",
 			Aliases: []string{"p"},
 			Usage:   "`NAME` of your project",
 		},
+
 		&cli.StringFlag{
 			Name:    "project-type",
 			Aliases: []string{"pt"},
 			Usage:   "type of your project",
 		},
+
 		&cli.StringFlag{
 			Name:    "repository-name",
 			Aliases: []string{"r"},
@@ -56,8 +62,34 @@ func (c *cmd) getFlags() []cli.Flag {
 		},
 
 		&cli.BoolFlag{
+			Name:    "list-project-styles",
+			Aliases: []string{"lps"},
+			Usage:   "list project styles",
+		},
+
+		&cli.BoolFlag{
 			Name:  "no-license",
 			Usage: "do not add LICENSE file",
+		},
+
+		&cli.BoolFlag{
+			Name:  "no-codeowners",
+			Usage: "do not add CODEOWNERS file",
+		},
+
+		&cli.BoolFlag{
+			Name:  "no-codecov",
+			Usage: "do not add .codecov.yml file",
+		},
+
+		&cli.BoolFlag{
+			Name:  "no-issue-template",
+			Usage: "do not create ISSUE_TEMPLATE folder and files",
+		},
+
+		&cli.BoolFlag{
+			Name:  "no-pull-request-template",
+			Usage: "do not create pull_request_template.md file",
 		},
 
 		&cli.BoolFlag{
