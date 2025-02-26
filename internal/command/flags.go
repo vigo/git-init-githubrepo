@@ -37,9 +37,9 @@ func (c *cmd) getFlags() []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Name:    "project-type",
-			Aliases: []string{"pt"},
-			Usage:   "type of your project",
+			Name:    "project-style",
+			Aliases: []string{"ps"},
+			Usage:   "style of your project",
 		},
 
 		&cli.StringFlag{
@@ -68,28 +68,18 @@ func (c *cmd) getFlags() []cli.Flag {
 		},
 
 		&cli.BoolFlag{
-			Name:  "no-license",
-			Usage: "do not add LICENSE file",
+			Name:  "disable-bumpversion",
+			Usage: "do not create .bumpversion.cfg and badge to README",
 		},
 
 		&cli.BoolFlag{
-			Name:  "no-codeowners",
+			Name:  "disable-coc",
+			Usage: "do not add CODE_OF_CONDUCT",
+		},
+
+		&cli.BoolFlag{
+			Name:  "disable-codeowners",
 			Usage: "do not add CODEOWNERS file",
-		},
-
-		&cli.BoolFlag{
-			Name:  "no-codecov",
-			Usage: "do not add .codecov.yml file",
-		},
-
-		&cli.BoolFlag{
-			Name:  "no-issue-template",
-			Usage: "do not create ISSUE_TEMPLATE folder and files",
-		},
-
-		&cli.BoolFlag{
-			Name:  "no-pull-request-template",
-			Usage: "do not create pull_request_template.md file",
 		},
 
 		&cli.BoolFlag{
@@ -98,13 +88,28 @@ func (c *cmd) getFlags() []cli.Flag {
 		},
 
 		&cli.BoolFlag{
-			Name:  "disable-bumpversion",
-			Usage: "do not create .bumpversion.cfg and badge to README",
+			Name:  "disable-funding",
+			Usage: "do not add FUNDING.yml file",
 		},
 
 		&cli.BoolFlag{
-			Name:  "disable-coc",
-			Usage: "do not add CODE_OF_CONDUCT",
+			Name:  "disable-issue-template",
+			Usage: "do not create ISSUE_TEMPLATE folder and files",
+		},
+
+		&cli.BoolFlag{
+			Name:  "disable-license",
+			Usage: "do not add LICENSE file",
+		},
+
+		&cli.BoolFlag{
+			Name:  "disable-security",
+			Usage: "do not create SECURITY.md file",
+		},
+
+		&cli.BoolFlag{
+			Name:  "disable-pull-request-template",
+			Usage: "do not create pull_request_template.md file",
 		},
 	}
 }

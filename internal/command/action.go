@@ -69,16 +69,21 @@ type (
 	}
 
 	readmeVariables struct {
-		FullName           string
-		GitHubUsername     string
-		ProjectName        string
-		RepositoryName     string
-		License            string
-		LicenseDescription string
-		AddLicense         bool
-		AddForkInfo        bool
-		AddCOC             bool
-		AddBumpVersion     bool
+		FullName               string
+		GitHubUsername         string
+		ProjectName            string
+		RepositoryName         string
+		License                string
+		LicenseDescription     string
+		AddLicense             bool
+		AddForkInfo            bool
+		AddCOC                 bool
+		AddBumpVersion         bool
+		AddCodeowners          bool
+		AddFunding             bool
+		AddPullRequestTemplate bool
+		AddIssueTemplate       bool
+		AddSecurity            bool
 	}
 	projectStyle  string
 	projectStyles map[projectStyle]string
@@ -109,6 +114,8 @@ const (
 	fnCOC         = "CODE_OF_CONDUCT.md"
 	fnLicense     = "LICENSE"
 	fnBumpVersion = ".bumpversion.toml"
+
+	// fnIssueTemplateFeatureRequest = "feature_request.md".
 )
 
 // sentinel errors.
@@ -136,7 +143,8 @@ func availableLicenseTypes() licenseTypes {
 func availableProjectStyles() projectStyles {
 	return projectStyles{
 		projectStyleGo: `creates .github/workflows/, linter and tester actions, 
-            golangci.yml, .pre-commit-config.yaml, dependabot.yml, .gitignore`,
+            golangci.yml, .pre-commit-config.yaml, dependabot.yml, .gitignore
+            .pre-commit-config.yaml, .codecov.yml`,
 	}
 }
 
@@ -199,7 +207,7 @@ func (k *cmd) actions() func(*cli.Context) error {
 		}
 
 		argLicense := c.String("license")
-		argNoLicense := c.Bool("no-license")
+		argNoLicense := c.Bool("disable-license")
 		if !argNoLicense {
 			licenseAsType := licenseType(argLicense)
 			if _, ok := availableLicenseTypes()[licenseAsType]; !ok {
@@ -238,6 +246,12 @@ func (k *cmd) actions() func(*cli.Context) error {
 		argDisableBumpVersion := c.Bool("disable-bumpversion")
 		argLicenseDescription := availableLicenseTypes()[licenseType(argLicense)]
 
+		argDisableCodeowners := c.Bool("disable-codeowners")
+		argDisableFunding := c.Bool("disable-funding")
+		argDisablePullRequestTemplate := c.Bool("disable-pull-request-template")
+		argDisableSecurity := c.Bool("disable-security")
+		argDisableIssueTemplate := c.Bool("disable-issue-template")
+
 		readmeVars := readmeVariables{
 			FullName:           argFullName,
 			GitHubUsername:     argUserName,
@@ -249,6 +263,23 @@ func (k *cmd) actions() func(*cli.Context) error {
 			AddForkInfo:        !argDisableFork,
 			AddCOC:             !argDisableCOC,
 			AddBumpVersion:     !argDisableBumpVersion,
+
+			AddCodeowners:          !argDisableCodeowners,
+			AddFunding:             !argDisableFunding,
+			AddPullRequestTemplate: !argDisablePullRequestTemplate,
+			AddSecurity:            !argDisableSecurity,
+			AddIssueTemplate:       !argDisableIssueTemplate,
+		}
+
+		var createGitHubFolder bool
+		if readmeVars.AddCodeowners || readmeVars.AddFunding || readmeVars.AddPullRequestTemplate ||
+			readmeVars.AddIssueTemplate {
+			createGitHubFolder = true
+		}
+
+		fmt.Println("createGitHubFolder", createGitHubFolder)
+		if 2 > 1 {
+			return nil
 		}
 
 		readmeFilePath := strings.Join(

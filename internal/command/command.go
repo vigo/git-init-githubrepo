@@ -101,24 +101,40 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		kommand.gitUserEmail = "your@email"
 	}
 
-	keys := make([]string, 0, len(availableLicenseTypes()))
+	licenseTypeKeys := make([]string, 0, len(availableLicenseTypes()))
 	for k := range availableLicenseTypes() {
-		keys = append(keys, k.String())
+		licenseTypeKeys = append(licenseTypeKeys, k.String())
 	}
-	sort.Strings(keys)
+	sort.Strings(licenseTypeKeys)
 
-	extrasAvailableLicenses := make([]string, 0, len(availableLicenseTypes()))
-	for _, k := range keys {
+	extrasAvailableLicenses := make([]string, 0, len(licenseTypeKeys))
+	for _, k := range licenseTypeKeys {
 		extrasAvailableLicenses = append(
 			extrasAvailableLicenses,
 			fmt.Sprintf("  - `%s`: %s", k, availableLicenseTypes()[licenseType(k)]),
 		)
 	}
 
+	projectStyleKeys := make([]string, 0, len(availableProjectStyles()))
+	for k := range availableProjectStyles() {
+		projectStyleKeys = append(projectStyleKeys, k.String())
+	}
+	sort.Strings(projectStyleKeys)
+
+	extrasProjectStyles := make([]string, 0, len(projectStyleKeys))
+	for _, k := range projectStyleKeys {
+		extrasProjectStyles = append(
+			extrasProjectStyles,
+			fmt.Sprintf("  - `%s`", k),
+		)
+	}
+
 	extrasHelpFormatted := fmt.Sprintf(
 		extrasHelp(),
-		len(availableLicenseTypes()),
+		len(licenseTypeKeys),
 		strings.Join(extrasAvailableLicenses, "\n"),
+		len(projectStyleKeys),
+		strings.Join(extrasProjectStyles, "\n"),
 	)
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
 	cli.VersionPrinter = func(c *cli.Context) {
