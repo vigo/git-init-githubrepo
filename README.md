@@ -12,7 +12,18 @@ Create git repository for GitHub style:
 - `README.md` (as seen here!)
 - `LICENSE`
 - `CODE_OF_CONDUCT.md` (optional)
-- `.bumpversion.toml` file injection (optional)
+- `.bumpversion.toml` (optional)
+- `SECURITY.md` (optional)
+- `.github/CODEOWNERS` (optional)
+- `.github/FUNDING.yml` (optional)
+- `.github/pull_request_template.md` (optional)
+
+According to `--project-style` (currently only `go` available)
+
+- `.github/workflows/go-test.yml`
+- `.github/workflows/go-lint.yml`
+- `.github/dependabot.yml`
+- `.golangci.yml`
 
 ---
 
@@ -40,58 +51,7 @@ help :)
 ```bash
 $ git init-githubrepo -h
 
-NAME:
-   git-init-githubrepo - create GitHub friendly git repository with built-in README, LICENSE and more...
-
-USAGE:
-   git-init-githubrepo [global options] command [command options] [arguments...]
-
-VERSION:
-   <version-number>
-
-AUTHOR:
-   Uğur “vigo” Özyılmazel <ugurozyilmazel@gmail.com>
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --bash-completion                  generate bash-completion code (default: false)
-   --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "<your-default-full-name>")
-   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "<your-default-github-user-name>")
-   --email EMAIL, -e EMAIL            your contact EMAIL (default: "<your-default-email>")
-   --project-name NAME, -p NAME       NAME of your project
-   --repository-name NAME, -r NAME    NAME of your GitHub repository
-   --license LICENSE, -l LICENSE      add LICENSE (default: "mit")
-   --list-licenses, --ll              list licenses (default: false)
-   --no-license                       do not add LICENSE file (default: false)
-   --disable-fork                     do not add fork information to README (default: false)
-   --disable-bumpversion              do not create .bumpversion.cfg and badge to README (default: false)
-   --disable-coc                      do not add CODE_OF_CONDUCT (default: false)
-   --help, -h                         show help
-   --version, -v                      print the version
-
-AVALILABLE LICENSES (9):
-
-  - `apache-20`: Apache License 2.0
-  - `bsl-10`: Boost Software License 1.0
-  - `gnu-agpl30`: GNU Affero General Public License v3.0
-  - `gnu-gpl30`: GNU General Public License v3.0
-  - `gnu-lgpl30`: GNU Lesser General Public License v3.0
-  - `mit`: MIT
-  - `mit-na`: MIT No Attribution
-  - `moz-p20`: Mozilla Public License 2.0
-  - `unli`: The Unlicense
-
-EXAMPLES:
-
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world"
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --no-license
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license gnu-agpl30
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license moz-p20
+@wip
 ```
 
 Command fetches some variables from git configuration as default.
@@ -100,7 +60,7 @@ Command fetches some variables from git configuration as default.
 - `--username`: default is your `git config github.user` if exists
 - `--email`: default is your `git config user.email` if exists. Email will be used for `CODE_OF_CONDUCT` file.
 - `--license`: default license type is `mit`.
-- `--no-license` do not add license information to `README` and do not create `LICENSE` file
+- `--disable-license` do not add license information to `README` and do not create `LICENSE` file
 - `--disable-fork`: do not add fork information to `README`
 - `--disable-bumpversion`: do not create `.bumpversion.cfg` file
 - `--disable-coc`: do not create add code of conduct information `README` and do not create `CODE_OF_CONDUCT` file

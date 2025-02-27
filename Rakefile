@@ -70,13 +70,13 @@ namespace :test do
     }
   end
 
-  desc "show coverage after running tests"
+  desc 'show coverage after running tests'
   task :show_coverage do
     Rake::Task["test:run"].invoke('-v')
     system "go tool cover -html=coverage.out"
   end
 
-  desc "update coverage value in README"
+  desc 'update coverage value in README'
   task :update_coverage => [:has_gsed] do
     coverage_value = `GOLANG_ENV=test go test -count=1 -coverprofile=coverage.out ./... | grep 'ok'`.chomp.split("\t")
     coverage_ratio = coverage_value.last.split[1].gsub!('%', '%25')
@@ -86,7 +86,6 @@ namespace :test do
     }
   end
 end
-
 # -----------------------------------------------------------------------------
 
 
@@ -109,7 +108,7 @@ task :release, [:revision] => [:repo_clean] do |_, args|
 end
 # -----------------------------------------------------------------------------
 
-desc "build for test"
+desc 'build for test'
 task :build_for_test do
   system %{
     go build -o git-init-githubrepo cmd/git-init-githubrepo/main.go &&
