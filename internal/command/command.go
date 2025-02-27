@@ -136,6 +136,7 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		len(projectStyleKeys),
 		strings.Join(extrasProjectStyles, "\n"),
 	)
+
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)

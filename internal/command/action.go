@@ -277,9 +277,8 @@ func (k *cmd) actions() func(*cli.Context) error {
 			createGitHubFolder = true
 		}
 
-		fmt.Println("createGitHubFolder", createGitHubFolder)
-		if 2 > 1 {
-			return nil
+		if createGitHubFolder {
+			fmt.Println("createGitHubFolder", createGitHubFolder)
 		}
 
 		readmeFilePath := strings.Join(
