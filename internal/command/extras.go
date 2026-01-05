@@ -18,6 +18,7 @@ func extrasBashCompletion() string {
 	`
 }
 
+//nolint:revive
 func extrasHelp() string {
 	return `
 AVALILABLE LICENSE(S) (%d):

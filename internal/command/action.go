@@ -316,16 +316,21 @@ func (k *cmd) actions() func(*cli.Context) error {
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseTHEUNL); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
+
 			case licenseBSL10.String():
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseBSL10); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
+
 			case licenseAPACHE20.String():
 				licenseParams := licenseAPACHEVariables{
 					FullName: argFullName,
 					Year:     now.Year(),
 				}
-				if err := k.GenerateTextFromTemplate(licenseFilePath, &licenseParams, templateLicenseAPACHE20); err != nil {
+
+				if err := k.GenerateTextFromTemplate(
+					licenseFilePath,
+					&licenseParams, templateLicenseAPACHE20); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
 
@@ -333,6 +338,7 @@ func (k *cmd) actions() func(*cli.Context) error {
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseMOZP20); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
+
 			case licenseGNULesserGPL30.String():
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseGNULesserGPL30); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
