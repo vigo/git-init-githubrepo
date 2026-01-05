@@ -19,14 +19,6 @@ task :repo_clean do
   abort 'please commit your changes first!' unless `git status -s | wc -l`.strip.to_i.zero?
 end
 
-task :current_version do
-  version_file = File.open('.bumpversion.cfg', 'r')
-  data = version_file.read
-  version_file.close
-  match = /current_version = (\d+).(\d+).(\d+)/.match(data)
-  "#{match[1]}.#{match[2]}.#{match[3]}"
-end
-
 task :has_bumpversion do
   Rake::Task['command_exists'].invoke('bumpversion')
 end
@@ -94,17 +86,22 @@ end
 desc "Release new version #{AVAILABLE_REVISIONS.join(',')}, default: patch"
 task :release, [:revision] => [:repo_clean] do |_, args|
   args.with_defaults(revision: 'patch')
-  Rake::Task['bump'].invoke(args.revision)
 
   current_branch = "#{Rake::Task['get_current_branch'].invoke.first.call}"
-  current_git_tag = "v#{Rake::Task['current_version'].execute.first.call}"
 
-  system %(
-    git push origin #{current_branch} &&
-    echo "-> push to #{current_branch}" &&
+  abort 'you should checkout to main' unless current_branch == 'main'
+
+  Rake::Task['bump'].invoke(args.revision)
+
+  current_version = `bump-my-version show current_version`.chomp
+  current_git_tag = "v#{current_version}"
+
+  system %{
+    git push origin main &&
+    echo "-> push to main" &&
     git push origin #{current_git_tag} &&
     echo "-> push to #{current_git_tag}"
-  )
+  }
 end
 # -----------------------------------------------------------------------------
 
