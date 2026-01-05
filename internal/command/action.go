@@ -69,21 +69,32 @@ type (
 	}
 
 	readmeVariables struct {
-		FullName           string
-		GitHubUsername     string
-		ProjectName        string
-		RepositoryName     string
-		License            string
-		LicenseDescription string
-		AddLicense         bool
-		AddForkInfo        bool
-		AddCOC             bool
-		AddBumpVersion     bool
+		FullName               string
+		GitHubUsername         string
+		ProjectName            string
+		RepositoryName         string
+		License                string
+		LicenseDescription     string
+		AddLicense             bool
+		AddForkInfo            bool
+		AddCOC                 bool
+		AddBumpVersion         bool
+		AddCodeowners          bool
+		AddFunding             bool
+		AddPullRequestTemplate bool
+		AddIssueTemplate       bool
+		AddSecurity            bool
 	}
+	projectStyle  string
+	projectStyles map[projectStyle]string
 )
 
 func (lt licenseType) String() string {
 	return string(lt)
+}
+
+func (ps projectStyle) String() string {
+	return string(ps)
 }
 
 const (
@@ -97,10 +108,14 @@ const (
 	licenseBSL10            = licenseType("bsl-10")
 	licenseTHEUNL           = licenseType("unli")
 
+	projectStyleGo = projectStyle("go")
+
 	fnReadme      = "README.md"
 	fnCOC         = "CODE_OF_CONDUCT.md"
 	fnLicense     = "LICENSE"
 	fnBumpVersion = ".bumpversion.toml"
+
+	// fnIssueTemplateFeatureRequest = "feature_request.md".
 )
 
 // sentinel errors.
@@ -111,16 +126,26 @@ var (
 	ErrAlreadyFolderExists    = errors.New("folder already exists")
 )
 
-var availableLicenseTypes = licenseTypes{
-	licenseMIT:              "MIT",
-	licenseMITNoAttribution: "MIT No Attribution",
-	licenseGNUAfferoGPL30:   "GNU Affero General Public License v3.0",
-	licenseGNUGPL30:         "GNU General Public License v3.0",
-	licenseGNULesserGPL30:   "GNU Lesser General Public License v3.0",
-	licenseMOZP20:           "Mozilla Public License 2.0",
-	licenseAPACHE20:         "Apache License 2.0",
-	licenseBSL10:            "Boost Software License 1.0",
-	licenseTHEUNL:           "The Unlicense",
+func availableLicenseTypes() licenseTypes {
+	return licenseTypes{
+		licenseMIT:              "MIT",
+		licenseMITNoAttribution: "MIT No Attribution",
+		licenseGNUAfferoGPL30:   "GNU Affero General Public License v3.0",
+		licenseGNUGPL30:         "GNU General Public License v3.0",
+		licenseGNULesserGPL30:   "GNU Lesser General Public License v3.0",
+		licenseMOZP20:           "Mozilla Public License 2.0",
+		licenseAPACHE20:         "Apache License 2.0",
+		licenseBSL10:            "Boost Software License 1.0",
+		licenseTHEUNL:           "The Unlicense",
+	}
+}
+
+func availableProjectStyles() projectStyles {
+	return projectStyles{
+		projectStyleGo: `creates .github/workflows/, linter and tester actions, 
+            golangci.yml, .pre-commit-config.yaml, dependabot.yml, .gitignore
+            .pre-commit-config.yaml, .codecov.yml`,
+	}
 }
 
 func (k *cmd) actions() func(*cli.Context) error {
@@ -128,31 +153,45 @@ func (k *cmd) actions() func(*cli.Context) error {
 		wr := c.App.Writer
 
 		if c.Bool("bash-completion") {
-			fmt.Fprintf(wr, "%s\n", extrasBashCompletion)
+			fmt.Fprintf(wr, "%s\n", extrasBashCompletion())
 
 			return nil
 		}
 
 		if c.Bool("list-licenses") {
-			fmt.Fprintf(wr, "\n%s: %d\n\n", "available license(s)", len(availableLicenseTypes))
+			fmt.Fprintf(wr, "\n%s: %d\n\n", "available license(s)", len(availableLicenseTypes()))
 
-			keys := make([]string, 0, len(availableLicenseTypes))
-			for k := range availableLicenseTypes {
+			keys := make([]string, 0, len(availableLicenseTypes()))
+			for k := range availableLicenseTypes() {
 				keys = append(keys, k.String())
 			}
 			sort.Strings(keys)
 
 			for _, k := range keys {
-				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes[licenseType(k)])
+				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes()[licenseType(k)])
 			}
 			fmt.Fprintln(wr, "")
 
 			return nil
 		}
 
-		if os.Getenv("GOLANG_ENV") == "test" {
-			_ = os.Chdir(os.TempDir())
+		if c.Bool("list-project-styles") {
+			fmt.Fprintf(wr, "\n%s: %d\n\n", "available project style(s)", len(availableProjectStyles()))
+
+			keys := make([]string, 0, len(availableProjectStyles()))
+			for k := range availableProjectStyles() {
+				keys = append(keys, k.String())
+			}
+			sort.Strings(keys)
+
+			for _, k := range keys {
+				fmt.Fprintf(wr, "    - `%s`: %s\n", k, availableProjectStyles()[projectStyle(k)])
+			}
+			fmt.Fprintln(wr, "")
+
+			return nil
 		}
+
 		if existingRepoPath, _ := k.runGITCommand("rev-parse", "--git-dir"); existingRepoPath != "" {
 			return ErrAlreadyInAGitRepo
 		}
@@ -168,12 +207,12 @@ func (k *cmd) actions() func(*cli.Context) error {
 		}
 
 		argLicense := c.String("license")
-		argNoLicense := c.Bool("no-license")
+		argNoLicense := c.Bool("disable-license")
 		if !argNoLicense {
 			licenseAsType := licenseType(argLicense)
-			if _, ok := availableLicenseTypes[licenseAsType]; !ok {
-				lkeys := make([]string, 0, len(availableLicenseTypes))
-				for k := range availableLicenseTypes {
+			if _, ok := availableLicenseTypes()[licenseAsType]; !ok {
+				lkeys := make([]string, 0, len(availableLicenseTypes()))
+				for k := range availableLicenseTypes() {
 					lkeys = append(lkeys, "`"+string(k)+"`")
 				}
 
@@ -205,7 +244,13 @@ func (k *cmd) actions() func(*cli.Context) error {
 		argDisableFork := c.Bool("disable-fork")
 		argDisableCOC := c.Bool("disable-coc")
 		argDisableBumpVersion := c.Bool("disable-bumpversion")
-		argLicenseDescription := availableLicenseTypes[licenseType(argLicense)]
+		argLicenseDescription := availableLicenseTypes()[licenseType(argLicense)]
+
+		argDisableCodeowners := c.Bool("disable-codeowners")
+		argDisableFunding := c.Bool("disable-funding")
+		argDisablePullRequestTemplate := c.Bool("disable-pull-request-template")
+		argDisableSecurity := c.Bool("disable-security")
+		argDisableIssueTemplate := c.Bool("disable-issue-template")
 
 		readmeVars := readmeVariables{
 			FullName:           argFullName,
@@ -218,6 +263,22 @@ func (k *cmd) actions() func(*cli.Context) error {
 			AddForkInfo:        !argDisableFork,
 			AddCOC:             !argDisableCOC,
 			AddBumpVersion:     !argDisableBumpVersion,
+
+			AddCodeowners:          !argDisableCodeowners,
+			AddFunding:             !argDisableFunding,
+			AddPullRequestTemplate: !argDisablePullRequestTemplate,
+			AddSecurity:            !argDisableSecurity,
+			AddIssueTemplate:       !argDisableIssueTemplate,
+		}
+
+		var createGitHubFolder bool
+		if readmeVars.AddCodeowners || readmeVars.AddFunding || readmeVars.AddPullRequestTemplate ||
+			readmeVars.AddIssueTemplate {
+			createGitHubFolder = true
+		}
+
+		if createGitHubFolder {
+			fmt.Println("createGitHubFolder", createGitHubFolder)
 		}
 
 		readmeFilePath := strings.Join(
@@ -255,16 +316,21 @@ func (k *cmd) actions() func(*cli.Context) error {
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseTHEUNL); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
+
 			case licenseBSL10.String():
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseBSL10); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
+
 			case licenseAPACHE20.String():
 				licenseParams := licenseAPACHEVariables{
 					FullName: argFullName,
 					Year:     now.Year(),
 				}
-				if err := k.GenerateTextFromTemplate(licenseFilePath, &licenseParams, templateLicenseAPACHE20); err != nil {
+
+				if err := k.GenerateTextFromTemplate(
+					licenseFilePath,
+					&licenseParams, templateLicenseAPACHE20); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
 
@@ -272,6 +338,7 @@ func (k *cmd) actions() func(*cli.Context) error {
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseMOZP20); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)
 				}
+
 			case licenseGNULesserGPL30.String():
 				if err := k.GenerateTextFromTemplate(licenseFilePath, nil, templateLicenseGNULesserGPL30); err != nil {
 					return fmt.Errorf("could not generate %s file, %w", fnLicense, err)

@@ -14,8 +14,10 @@ import (
 	"github.com/vigo/git-init-githubrepo/internal/version"
 )
 
-var templateFilters = template.FuncMap{
-	"Upper": strings.ToUpper,
+func templateFilters() template.FuncMap {
+	return template.FuncMap{
+		"Upper": strings.ToUpper,
+	}
 }
 
 const filePerm = 0o0644
@@ -40,7 +42,7 @@ func (k *cmd) Run(args []string) error {
 }
 
 func (k *cmd) GenerateTextFromTemplate(fileName string, content any, templateString string) error {
-	tmpl, err := template.New(fileName).Funcs(templateFilters).Parse(templateString)
+	tmpl, err := template.New(fileName).Funcs(templateFilters()).Parse(templateString)
 	if err != nil {
 		return fmt.Errorf("could not parse template: %w", err)
 	}
@@ -99,25 +101,42 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		kommand.gitUserEmail = "your@email"
 	}
 
-	keys := make([]string, 0, len(availableLicenseTypes))
-	for k := range availableLicenseTypes {
-		keys = append(keys, k.String())
+	licenseTypeKeys := make([]string, 0, len(availableLicenseTypes()))
+	for k := range availableLicenseTypes() {
+		licenseTypeKeys = append(licenseTypeKeys, k.String())
 	}
-	sort.Strings(keys)
+	sort.Strings(licenseTypeKeys)
 
-	extrasAvailableLicenses := make([]string, 0, len(availableLicenseTypes))
-	for _, k := range keys {
+	extrasAvailableLicenses := make([]string, 0, len(licenseTypeKeys))
+	for _, k := range licenseTypeKeys {
 		extrasAvailableLicenses = append(
 			extrasAvailableLicenses,
-			fmt.Sprintf("  - `%s`: %s", k, availableLicenseTypes[licenseType(k)]),
+			fmt.Sprintf("  - `%s`: %s", k, availableLicenseTypes()[licenseType(k)]),
+		)
+	}
+
+	projectStyleKeys := make([]string, 0, len(availableProjectStyles()))
+	for k := range availableProjectStyles() {
+		projectStyleKeys = append(projectStyleKeys, k.String())
+	}
+	sort.Strings(projectStyleKeys)
+
+	extrasProjectStyles := make([]string, 0, len(projectStyleKeys))
+	for _, k := range projectStyleKeys {
+		extrasProjectStyles = append(
+			extrasProjectStyles,
+			fmt.Sprintf("  - `%s`", k),
 		)
 	}
 
 	extrasHelpFormatted := fmt.Sprintf(
-		extrasHelp,
-		len(availableLicenseTypes),
+		extrasHelp(),
+		len(licenseTypeKeys),
 		strings.Join(extrasAvailableLicenses, "\n"),
+		len(projectStyleKeys),
+		strings.Join(extrasProjectStyles, "\n"),
 	)
+
 	cli.AppHelpTemplate = fmt.Sprintf("%s%s\n", cli.AppHelpTemplate, extrasHelpFormatted)
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Fprintf(c.App.Writer, "%s\n", c.App.Version)
@@ -127,7 +146,7 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Writer:               kommand.writer,
-		Usage:                extrasAppUsage,
+		Usage:                extrasAppUsage(),
 		Compiled:             time.Now(),
 		Authors: []*cli.Author{
 			{
@@ -135,7 +154,6 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 				Email: "ugurozyilmazel@gmail.com",
 			},
 		},
-		// Before:               commandBeforeAction,
 		Flags:  kommand.getFlags(),
 		Action: kommand.actions(),
 	}

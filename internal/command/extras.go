@@ -1,7 +1,7 @@
 package command
 
-var (
-	extrasBashCompletion = `_git_init_githubrepo() {
+func extrasBashCompletion() string {
+	return `_git_init_githubrepo() {
 	  if [[ "${COMP_WORDS[0]}" != "source" ]]; then
 	    local cur opts base
 	    COMPREPLY=()
@@ -16,9 +16,16 @@ var (
 	  fi
 	}
 	`
+}
 
-	extrasHelp = `
-AVALILABLE LICENSES (%d):
+//nolint:revive
+func extrasHelp() string {
+	return `
+AVALILABLE LICENSE(S) (%d):
+
+%s
+
+AVALILABLE PROJECT STYLE(S) (%d):
 
 %s
 
@@ -28,11 +35,13 @@ EXAMPLES:
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
-  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --no-license
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --disable-license
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license gnu-agpl30
   $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license moz-p20
 
 `
+}
 
-	extrasAppUsage = `create GitHub friendly git repository with built-in README, LICENSE and more...`
-)
+func extrasAppUsage() string {
+	return `create GitHub friendly git repository with built-in README, LICENSE and more...`
+}
