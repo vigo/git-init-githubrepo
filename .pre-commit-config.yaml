@@ -1,7 +1,6 @@
 repos:
-  - repo: https://github.com/dnephin/pre-commit-golang
-    rev: v0.5.1
+  - repo: https://github.com/TekWizely/pre-commit-golang
+    rev: v1.0.0-rc.1
     hooks:
-      - id: golangci-lint
+      - id: golangci-lint-mod
       - id: go-mod-tidy
-      - id: go-unit-tests
