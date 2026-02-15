@@ -51,7 +51,69 @@ help :)
 ```bash
 $ git init-githubrepo -h
 
-@wip
+NAME:
+   git-init-githubrepo - create GitHub friendly git repository with built-in README, LICENSE and more...
+
+USAGE:
+   git-init-githubrepo [global options] command [command options]
+
+VERSION:
+   0.4.0
+
+AUTHOR:
+   Uğur “vigo” Özyılmazel <ugurozyilmazel@gmail.com>
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --bash-completion                  generate bash-completion code (default: false)
+   --full-name FULLNAME, -f FULLNAME  your FULLNAME (default: "Uğur Özyılmazel")
+   --username USERNAME, -u USERNAME   your GitHub USERNAME (default: "vigo")
+   --email EMAIL, -e EMAIL            your contact EMAIL (default: "ugurozyilmazel@gmail.com")
+   --project-name NAME, -p NAME       NAME of your project
+   --project-style value, --ps value  style of your project
+   --repository-name NAME, -r NAME    NAME of your GitHub repository
+   --license LICENSE, -l LICENSE      add LICENSE (default: "mit")
+   --list-licenses, --ll              list licenses (default: false)
+   --list-project-styles, --lps       list project styles (default: false)
+   --disable-bumpversion              do not create .bumpversion.cfg and badge to README (default: false)
+   --disable-coc                      do not add CODE_OF_CONDUCT (default: false)
+   --disable-codeowners               do not add CODEOWNERS file (default: false)
+   --disable-fork                     do not add fork information to README (default: false)
+   --disable-funding                  do not add FUNDING.yml file (default: false)
+   --disable-issue-template           do not create ISSUE_TEMPLATE folder and files (default: false)
+   --disable-license                  do not add LICENSE file (default: false)
+   --disable-security                 do not create SECURITY.md file (default: false)
+   --disable-pull-request-template    do not create pull_request_template.md file (default: false)
+   --help, -h                         show help
+   --version, -v                      print the version
+
+AVALILABLE LICENSE(S) (9):
+
+  - `apache-20`: Apache License 2.0
+  - `bsl-10`: Boost Software License 1.0
+  - `gnu-agpl30`: GNU Affero General Public License v3.0
+  - `gnu-gpl30`: GNU General Public License v3.0
+  - `gnu-lgpl30`: GNU Lesser General Public License v3.0
+  - `mit`: MIT
+  - `mit-na`: MIT No Attribution
+  - `moz-p20`: Mozilla Public License 2.0
+  - `unli`: The Unlicense
+
+AVALILABLE PROJECT STYLE(S) (1):
+
+  - `go`
+
+EXAMPLES:
+
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world"
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --disable-fork --disable-bumpversion --disable-coc --disable-license
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license gnu-agpl30
+  $ git init-githubrepo -p "My Awesome Project" -r "hello-world" --license moz-p20
 ```
 
 Command fetches some variables from git configuration as default.
