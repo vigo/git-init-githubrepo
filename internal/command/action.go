@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -165,7 +165,7 @@ func (k *cmd) actions() func(*cli.Context) error {
 			for k := range availableLicenseTypes() {
 				keys = append(keys, k.String())
 			}
-			sort.Strings(keys)
+			slices.Sort(keys)
 
 			for _, k := range keys {
 				fmt.Fprintf(wr, "    - `%s`: for `%s` license\n", k, availableLicenseTypes()[licenseType(k)])
@@ -182,7 +182,7 @@ func (k *cmd) actions() func(*cli.Context) error {
 			for k := range availableProjectStyles() {
 				keys = append(keys, k.String())
 			}
-			sort.Strings(keys)
+			slices.Sort(keys)
 
 			for _, k := range keys {
 				fmt.Fprintf(wr, "    - `%s`: %s\n", k, availableProjectStyles()[projectStyle(k)])
