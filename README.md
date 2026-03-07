@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-0.4.0-orange.svg)
+![Version](https://img.shields.io/badge/version-0.4.1-orange.svg)
 [![golangci-lint](https://github.com/vigo/git-init-githubrepo/actions/workflows/golang-lint.yml/badge.svg)](https://github.com/vigo/git-init-githubrepo/actions/workflows/golang-lint.yml)
 [![build and test](https://github.com/vigo/git-init-githubrepo/actions/workflows/go.yml/badge.svg)](https://github.com/vigo/git-init-githubrepo/actions/workflows/go.yml)
 [![codecov](https://codecov.io/gh/vigo/git-init-githubrepo/branch/main/graph/badge.svg?token=QFA1S8DT00)](https://codecov.io/gh/vigo/git-init-githubrepo)
@@ -58,7 +58,7 @@ USAGE:
    git-init-githubrepo [global options] command [command options]
 
 VERSION:
-   0.4.0
+   0.4.1
 
 AUTHOR:
    Uğur “vigo” Özyılmazel <ugurozyilmazel@gmail.com>
