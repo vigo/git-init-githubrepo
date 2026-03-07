@@ -71,6 +71,32 @@ func TestListLicences(t *testing.T) {
 	}
 }
 
+func TestListStyles(t *testing.T) {
+	input := []string{
+		"--list-project-styles",
+	}
+
+	args := os.Args[:1]
+	args = append(args, input...)
+
+	out := new(bytes.Buffer)
+	cmd, err := command.New(
+		command.WithWriter(out),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := cmd.Run(args); err != nil {
+		t.Errorf("want: nil, got: %v", err)
+	}
+
+	got := string(bytes.TrimSpace(out.Bytes()))
+	if !strings.Contains(got, "go") {
+		t.Errorf("want: go, got: %v", got)
+	}
+}
+
 func Test_CLI_Some_flags(t *testing.T) {
 	originalDir, err := os.Getwd()
 	if err != nil {
@@ -341,5 +367,122 @@ func TestCreateAll(t *testing.T) {
 				t.Errorf("can not delete temp folder: %v", err)
 			}
 		})
+	}
+}
+
+func TestCreateWithDisableFlags(t *testing.T) {
+	originalDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+
+	tempDir := os.TempDir()
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("Failed to change directory to temp: %v", err)
+	}
+
+	defer func() {
+		if err := os.Chdir(originalDir); err != nil {
+			t.Fatalf("Failed to restore original directory: %v", err)
+		}
+	}()
+
+	testCases := []struct {
+		name         string
+		input        []string
+		missingFiles []string
+	}{
+		{
+			name: "create with disable-license",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--disable-license",
+			},
+			missingFiles: []string{"LICENSE"},
+		},
+		{
+			name: "create with disable-coc",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--disable-coc",
+			},
+			missingFiles: []string{"CODE_OF_CONDUCT.md"},
+		},
+		{
+			name: "create with disable-bumpversion",
+			input: []string{
+				"--project-name", "test",
+				"--repository-name", "repo",
+				"--disable-bumpversion",
+			},
+			missingFiles: []string{".bumpversion.toml"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			args := os.Args[:1]
+			args = append(args, testCase.input...)
+
+			cmd, err := command.New()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if err := cmd.Run(args); err != nil {
+				t.Errorf("want: nil, got: %v", err)
+			}
+
+			for _, file := range testCase.missingFiles {
+				filePath := strings.Join([]string{tmpFolder, file}, string(os.PathSeparator))
+				if _, err := os.Stat(filePath); !errors.Is(err, os.ErrNotExist) {
+					t.Errorf("%s should not exist but it does", filePath)
+				}
+			}
+
+			if err := os.RemoveAll(tmpFolder); err != nil {
+				t.Errorf("can not delete temp folder: %v", err)
+			}
+		})
+	}
+}
+
+func TestAlreadyFolderExists(t *testing.T) {
+	originalDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+
+	tempDir := os.TempDir()
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("Failed to change directory to temp: %v", err)
+	}
+
+	defer func() {
+		if err := os.Chdir(originalDir); err != nil {
+			t.Fatalf("Failed to restore original directory: %v", err)
+		}
+	}()
+
+	if err := os.MkdirAll(tmpFolder, 0o750); err != nil {
+		t.Fatalf("could not create temp folder: %v", err)
+	}
+
+	args := os.Args[:1]
+	args = append(args, "--project-name", "test", "--repository-name", "repo")
+
+	cmd, err := command.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := cmd.Run(args); !errors.Is(err, command.ErrAlreadyFolderExists) {
+		t.Errorf("want: %v, got: %v", command.ErrAlreadyFolderExists, err)
+	}
+
+	if err := os.RemoveAll(tmpFolder); err != nil {
+		t.Errorf("can not delete temp folder: %v", err)
 	}
 }

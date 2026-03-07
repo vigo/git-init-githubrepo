@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 	"text/template"
 	"time"
@@ -105,7 +105,7 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 	for k := range availableLicenseTypes() {
 		licenseTypeKeys = append(licenseTypeKeys, k.String())
 	}
-	sort.Strings(licenseTypeKeys)
+	slices.Sort(licenseTypeKeys)
 
 	extrasAvailableLicenses := make([]string, 0, len(licenseTypeKeys))
 	for _, k := range licenseTypeKeys {
@@ -119,7 +119,7 @@ func New(options ...Option) (*cmd, error) { //nolint:revive
 	for k := range availableProjectStyles() {
 		projectStyleKeys = append(projectStyleKeys, k.String())
 	}
-	sort.Strings(projectStyleKeys)
+	slices.Sort(projectStyleKeys)
 
 	extrasProjectStyles := make([]string, 0, len(projectStyleKeys))
 	for _, k := range projectStyleKeys {
